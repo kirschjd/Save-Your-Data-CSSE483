@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "551437431964",
+    "firebase_url": "https://save-your-data-csse483.firebaseio.com",
+    "project_id": "save-your-data-csse483",
+    "storage_bucket": "save-your-data-csse483.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551437431964:android:557503f1305e6bd9",
+        "android_client_info": {
+          "package_name": "edu.rose_hulman.bradylz.saveyourdata"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "551437431964-e10k2j1kor03ih4dgkiadcs0fu1ege47.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSj-5xuI88gtasZBZZEE2zfMxAUwHja2I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
