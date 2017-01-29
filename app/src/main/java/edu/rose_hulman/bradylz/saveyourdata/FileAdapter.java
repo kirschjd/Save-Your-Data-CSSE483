@@ -27,13 +27,14 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     private ArrayList<File> mFiles = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private DatabaseReference mUserRef;
-    private DatabaseReference mFileRef;
+    //private DatabaseReference mFileRef;
 
     public FileAdapter(Context context, RecyclerView recyclerView){
         mContext = context;
         mRecyclerView = recyclerView;
-        mUserRef = FirebaseDatabase.getInstance().getReference().child("users");
-        mFileRef = mUserRef.child("files");
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUserRef.addChildEventListener(new UserEventListener());
+        //mFileRef = mUserRef.child("files");
 //        mMovieQoutesRef.addChildEventListener(new QuotesChildEventListener());
         for(int i = 0; i < 5; i++) {
             mFiles.add(new File("File " + i, "Description", android.R.drawable.btn_default));
@@ -41,14 +42,42 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         mFiles.add(new File("File ", "Description", android.R.drawable.btn_default));
     }
 
+    public class UserEventListener implements ChildEventListener{
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    }
+
     public void update(File file, String title, String description) {
         file.setTitle(title);
         file.setDescription(description);
-        mFileRef.child(file.getKey()).setValue(file);
+        //mFileRef.child(file.getKey()).setValue(file);
     }
 
     public void add(File file) {
-        mFileRef.push().setValue(file);
+        //mFileRef.push().setValue(file);
     }
 
     class FilesChildEventListener implements ChildEventListener {

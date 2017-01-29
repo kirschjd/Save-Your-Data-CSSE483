@@ -111,7 +111,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
         //Adding in the cloud tab
         mTabHost.addTab(mTabHost.newTabSpec("general").setIndicator(getString(R.string.home_general_tab)), HomeGeneralTabFragment.class, null);
 
-        updateAdapter();
+        //updateAdapter();
 
         return view;
     }
@@ -132,7 +132,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-        updateAdapter();
+        //updateAdapter();
     }
 
     @Override
@@ -211,7 +211,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
                 public void afterTextChanged(Editable s) {
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
-                    updateAdapter();
+                    //updateAdapter();
                     mAdapter.update(file, name, description);
                 }
             };
