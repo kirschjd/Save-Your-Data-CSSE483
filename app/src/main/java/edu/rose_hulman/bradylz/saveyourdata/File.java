@@ -11,11 +11,19 @@ import com.google.firebase.database.Exclude;
  */
 
 public class File implements Parcelable{
-    //Git Test
     private String title;
     private String description;
     private Integer imageID;
+    private String filePath;
     private String key;
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
     public void setKey(String key) {
         this.key = key;

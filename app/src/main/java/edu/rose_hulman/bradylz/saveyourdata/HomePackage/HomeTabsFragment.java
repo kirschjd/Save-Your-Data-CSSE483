@@ -2,6 +2,7 @@ package edu.rose_hulman.bradylz.saveyourdata.HomePackage;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import edu.rose_hulman.bradylz.saveyourdata.Constants;
 import edu.rose_hulman.bradylz.saveyourdata.File;
@@ -47,6 +49,8 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
     private FragmentTabHost mTabHost;
     private Context mContext;
     private FileAdapter mAdapter;
+    //To identify photo(0) / video(1) / text file (2)
+    private int optionsIndex;
 
     public HomeTabsFragment() {
         // Required empty public constructor
@@ -93,8 +97,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showOptions();
             }
         });
 
@@ -111,9 +114,48 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
         //Adding in the cloud tab
         mTabHost.addTab(mTabHost.newTabSpec("general").setIndicator(getString(R.string.home_general_tab)), HomeGeneralTabFragment.class, null);
 
-        //updateAdapter();
-
         return view;
+    }
+
+    private void showOptions() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle("Choose a file type:");
+        optionsIndex = 0;
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.add_file_options, null, false);
+        builder.setView(view);
+
+        //Set button listeners for each option
+        ImageButton photoButton = (ImageButton) view.findViewById(R.id.photoButton);
+        photoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                optionsIndex = 0;
+                showAddEditDialog(null);
+            }
+        });
+
+        //Set button listeners for each option
+        ImageButton videoButton = (ImageButton) view.findViewById(R.id.videoButton);
+        videoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                optionsIndex = 1;
+                showAddEditDialog(null);
+            }
+        });
+
+        //Set button listeners for each option
+        ImageButton textButton = (ImageButton) view.findViewById(R.id.textButton);
+        textButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                optionsIndex = 2;
+                showAddEditDialog(null);
+            }
+        });
+
+        builder.create().show();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -132,7 +174,6 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-        //updateAdapter();
     }
 
     @Override
@@ -211,7 +252,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
                 public void afterTextChanged(Editable s) {
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
-                    //updateAdapter();
+                    //TODO: Commit the file to firebase after this step
                     mAdapter.update(file, name, description);
                 }
             };
@@ -226,7 +267,13 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
                 if (file == null) {
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
-                    mAdapter.add(new File(name, description, android.R.drawable.btn_star));
+
+                    if(optionsIndex == 0) {
+                        Intent intent = new Intent(Intent.ACTION_PICK,
+                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, 0);
+                    }
+                    //mAdapter.add(new File(name, description, android.R.drawable.btn_star));
                 }
             }
         });

@@ -14,6 +14,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -27,15 +29,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     private ArrayList<File> mFiles = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private DatabaseReference mUserRef;
-    //private DatabaseReference mFileRef;
+    private FirebaseStorage mStorage;
+    StorageReference mStorageRef;
 
     public FileAdapter(Context context, RecyclerView recyclerView){
         mContext = context;
         mRecyclerView = recyclerView;
+
+        //Linking to firebase
         mUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         mUserRef.addChildEventListener(new UserEventListener());
-        //mFileRef = mUserRef.child("files");
-//        mMovieQoutesRef.addChildEventListener(new QuotesChildEventListener());
+
+        // Create a storage reference from our app
+        mStorage = FirebaseStorage.getInstance();
+        mStorageRef = mStorage.getReferenceFromUrl("gs://save-your-data-csse483.appspot.com");
+
+        //Hard coded 'files' to check recycler views are working
         for(int i = 0; i < 5; i++) {
             mFiles.add(new File("File " + i, "Description", android.R.drawable.btn_default));
         }
@@ -73,6 +82,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     public void update(File file, String title, String description) {
         file.setTitle(title);
         file.setDescription(description);
+
         //mFileRef.child(file.getKey()).setValue(file);
     }
 
@@ -126,10 +136,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         }
     }
 
-
-
-
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(this.mContext).inflate(R.layout.file_row_view, parent, false);
@@ -142,7 +148,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         holder.nameTextView.setText(file.getTitle());
         holder.pictureImageView.setImageResource(file.getImageID());
         holder.descriptionTextView.setText(file.getDescription());
-//        holder.mPositionTextView.setText(String.format("I'm #%d", (position+1)));
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: Something
+            }
+        });
     }
 
     @Override

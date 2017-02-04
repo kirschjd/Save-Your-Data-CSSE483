@@ -64,6 +64,8 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     private FirebaseAuth.AuthStateListener mAuthListener;
     private OnCompleteListener mOnCompleteListener;
     private GoogleApiClient mGoogleApiClient;
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle toggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,24 +80,14 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         setupGoogleSignIn();
 
         //Setting up the navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-//        if(savedInstanceState == null){
-//            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//            HomeTabsFragment htf = new HomeTabsFragment();
-//            htf.setContext(this);
-//            ft.replace(R.id.content_nav, htf);
-//            for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
-//                getSupportFragmentManager().popBackStackImmediate();
-//            }
-//            ft.commit();
-//        }
     }
 
     private void setupGoogleSignIn() {
@@ -104,6 +96,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
+
         // Build a GoogleApiClient with access to GoogleSignIn.API and the options above.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -139,9 +132,31 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         };
     }
 
+    private void showNavBar(boolean show) {
+        int lockMode = show ? DrawerLayout.LOCK_MODE_UNLOCKED :
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED;
+        drawer.setDrawerLockMode(lockMode);
+        toggle.setDrawerIndicatorEnabled(show);
+    }
+
     private void switchToLoginFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content_nav, new LoginFragment(), "Login");
+
+        //Hide the nav bar if currently enabled
+        showNavBar(false);
+        ft.commit();
+    }
+
+    private void switchToHomeTabsFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        HomeTabsFragment htf = new HomeTabsFragment();
+        htf.setContext(this);
+        ft.replace(R.id.content_nav, htf, "Home Tabs");
+        ft.addToBackStack("home tabs");
+
+        //Show the nav bar if currently disabled
+        showNavBar(true);
         ft.commit();
     }
 
@@ -203,6 +218,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     public void onLogout() {
         mAuth.signOut();
+        showNavBar(false);
     }
 
     @Override
@@ -232,6 +248,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_logout) {
+            onLogout();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -244,9 +263,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         Fragment switchTo = null;
         switch(item.getItemId()) {
             case R.id.nav_home:
-//                HomeTabsFragment htf = new HomeTabsFragment();
-//                htf.setContext(this);
-//                switchTo = htf;
                 switchToHomeTabsFragment();
                 break;
             case R.id.nav_room:
@@ -277,13 +293,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         return true;
     }
 
-    private void switchToHomeTabsFragment() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_nav, new HomeTabsFragment(), "Home Tabs");
-        ft.addToBackStack("home tabs");
-        ft.commit();
-    }
-
     @Override
     public void onFragmentInteraction(Uri uri) {
 
@@ -291,6 +300,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        showLoginError(connectionResult.getErrorMessage());
     }
 }
