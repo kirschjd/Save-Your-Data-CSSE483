@@ -182,7 +182,7 @@ public class LoginFragment extends Fragment {
             mListener = (OnLoginListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRoomFileInteractionListener");
         }
     }
 

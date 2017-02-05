@@ -43,7 +43,9 @@ import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeDownloadsTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeGeneralTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeTabsFragment;
+import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomAdapter;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomContentTabFragment;
+import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomFragment;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomPeopleTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomTabsFragment;
 
@@ -56,7 +58,8 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                                                                 RoomContentTabFragment.OnFragmentInteractionListener,
                                                                 RoomTabsFragment.OnFragmentInteractionListener,
                                                                 LoginFragment.OnLoginListener,
-                                                                GoogleApiClient.OnConnectionFailedListener{
+                                                                GoogleApiClient.OnConnectionFailedListener,
+                                                                RoomFragment.OnRoomFileInteractionListener{
 
     public static final int REQUEST_CODE_INPUT = 4;
     private static final int RC_GOOGLE_LOGIN = 4;
@@ -66,6 +69,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     private GoogleApiClient mGoogleApiClient;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
+    private String mUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,12 +114,15 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                //Get user and uid to pass into fragments
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+                mUid = user.getUid();
+                Log.d(Constants.TAG, "Activity Uid: " + mUid);
                 Log.d(Constants.TAG, "Current User: " + user);
 
                 if (user != null) {
                     Log.d(Constants.TAG, "home tabs");
-                    switchToHomeTabsFragment();
+                    switchToHomeTabsFragment(mUid);
                 } else {
                     Log.d(Constants.TAG, "login");
                     switchToLoginFragment();
@@ -148,7 +155,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         ft.commit();
     }
 
-    private void switchToHomeTabsFragment() {
+    private void switchToHomeTabsFragment(String uid) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         HomeTabsFragment htf = new HomeTabsFragment();
         htf.setContext(this);
@@ -157,7 +164,21 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
         //Show the nav bar if currently disabled
         showNavBar(true);
+        htf.setUid(uid);
+
         ft.commit();
+    }
+
+    private void switchToRoomFragment(String uid) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        RoomFragment roomFrag = new RoomFragment();
+        ft.addToBackStack("previous");
+        ft.replace(R.id.content_nav, roomFrag);
+        ft.commit();
+
+        //Show the nav bar if currently disabled
+        showNavBar(true);
+        roomFrag.setUid(uid);
     }
 
     @Override
@@ -260,16 +281,17 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Fragment switchTo = null;
+        RoomFragment switchTo = null;
         switch(item.getItemId()) {
             case R.id.nav_home:
-                switchToHomeTabsFragment();
+                switchToHomeTabsFragment(mUid);
                 break;
             case R.id.nav_room:
-                switchTo = new RoomTabsFragment();
+                switchTo = new RoomFragment();
+                //switchToRoomFragment(mUid);
+                switchTo.setUid(mUid);
                 break;
             case R.id.nav_settings:
-                //Empty
                 Intent intent = new Intent(Settings.ACTION_SETTINGS);
                 if(intent.resolveActivity(getPackageManager()) != null){
                     startActivity(intent);
@@ -301,5 +323,10 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         showLoginError(connectionResult.getErrorMessage());
+    }
+
+    @Override
+    public void onRoomFileInteraction(File file) {
+
     }
 }

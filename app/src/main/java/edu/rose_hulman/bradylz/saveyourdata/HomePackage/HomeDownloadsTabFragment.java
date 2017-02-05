@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.rose_hulman.bradylz.saveyourdata.Constants;
+import edu.rose_hulman.bradylz.saveyourdata.File;
 import edu.rose_hulman.bradylz.saveyourdata.FileAdapter;
 import edu.rose_hulman.bradylz.saveyourdata.R;
 
@@ -27,11 +30,13 @@ public class HomeDownloadsTabFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private RecyclerView mRecyclerView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String mUid;
+    private FileAdapter mAdapter;
+    private RecyclerView mRecyclerView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,18 +71,28 @@ public class HomeDownloadsTabFragment extends Fragment {
         }
     }
 
+    public void setUid(String uid) {
+        mUid = uid;
+        Log.d(Constants.TAG, "Adapter: " + mAdapter);
+        Log.d(Constants.TAG, "Downloads Uid: " + mUid);
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_downloads_tab, container, false);
 
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.home_downloads_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
-        FileAdapter adapter = new FileAdapter(getContext(), recyclerView);
-        recyclerView.setAdapter(adapter);
-        recyclerView.scrollToPosition(0);
+        mRecyclerView = (RecyclerView)view.findViewById(R.id.home_downloads_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
+        mAdapter = new FileAdapter(getContext(), mRecyclerView);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.scrollToPosition(0);
+        Log.d(Constants.TAG, "Right before Uid: " + mUid);
+
+        //mAdapter.setUid(mUid);
         return view;
     }
 
@@ -88,6 +103,11 @@ public class HomeDownloadsTabFragment extends Fragment {
         }
     }
 
+    public void add(File file) {
+        Log.d(Constants.TAG, "Adapter for adding: " + mAdapter);
+        mAdapter.add(file);
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -95,7 +115,7 @@ public class HomeDownloadsTabFragment extends Fragment {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRoomFileInteractionListener");
         }
     }
 

@@ -3,30 +3,12 @@
 
     <item
         is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-auth\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="060a7157438a0b1b0706b99c430fb3ecbc5a79a4">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-auth-9.0.2_caa38199e4e8e9c9be1f06601f6f1dc52e8d2c4c\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-analytics-impl\9.0.2\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.1"
         sha1="a511c684ea4c2cf31a3377d51e7677cb76696e07">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-analytics-impl-9.0.2_ab8a8bb763b32038eb72ece8720d2ad69ef29814\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-common\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="9919563cffd8e3732e944d3c437d4b9575a08448">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-common-9.0.2_7af76703860f75a4c4d365e1544e1c97ee6a5a99\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -57,6 +39,132 @@
     </item>
     <item
         is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-auth-base\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="829c6e46cb221c2102801221c648b77113743e81">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-auth-base-9.0.2_2a9b1974b2d7859ca1514d3e4fc13d06f48141c2\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-database\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="4ec890171a97b5ab98292f131aa784e0f3792c73">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-database-9.0.2_e612c9f1b405af5473f754b3d538b2711aad5025\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="94d9cedd04b124aed044ac71c451a292856d854c">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-base-9.0.2_abea87e5aa8461d4c0339a4914fb3ce004ecf231\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="c74c6ba261bc2b765bb81091fa18e8c48ff866a3">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_dcdf1c0d1cea4e55d55cf467086673be19b62a06\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\24.2.1\support-annotations-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-24.2.1_452cb8fd44d53e428772f29d98c484518763e92d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-24.2.1_05847d3c8bfa6e21aab0db822e9170abbe141a3d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-24.2.1_9836c03bd7be0611e65783a6442007734b3a3565\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_d0957bff193554dd98769048240650843a7ae831\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-auth-common\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="568d5bda0b4d51f90d978ace369bb9ad024d2057">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-auth-common-9.0.2_412416ed747db13530008d35ab7235bf5f06480c\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\24.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="c5e6490573cd2cc8018417f60ddd251138b6ed61">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-cardview-v7-24.2.1_3e03e59383480a7c9050b72aed335f572dd4052b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-iid\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="b3d0809a742c5f768c6aa9efc6decd5c1d6cd227">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-iid-9.0.2_a6a754e20a23631b8ed94fbc091e4560254fd043\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\libs\internal_impl-24.2.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_1098657203ee5f1c84dae16a2194d13dd6d2eb4f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-auth\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="060a7157438a0b1b0706b99c430fb3ecbc5a79a4">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-auth-9.0.2_caa38199e4e8e9c9be1f06601f6f1dc52e8d2c4c\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-common\9.0.2\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="9919563cffd8e3732e944d3c437d4b9575a08448">
+        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-common-9.0.2_7af76703860f75a4c4d365e1544e1c97ee6a5a99\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -72,15 +180,6 @@
         revision="25.0.1"
         sha1="6ff48ef26bc539c78af4aa061cb9bad6abcbf5e8">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-storage-common-9.0.2_e5a7c7c9d1b607b12e35af60f5269f3702258ca5\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-auth-base\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="829c6e46cb221c2102801221c648b77113743e81">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-auth-base-9.0.2_2a9b1974b2d7859ca1514d3e4fc13d06f48141c2\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -129,15 +228,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-database\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="4ec890171a97b5ab98292f131aa784e0f3792c73">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-database-9.0.2_e612c9f1b405af5473f754b3d538b2711aad5025\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -153,15 +243,6 @@
         revision="25.0.1"
         sha1="7521486d9bfd2cd9e756e0cf75ed7d97f2ce2d3b">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-24.2.1_50505321bbdd876b149d79c2afdbf201feab57a7\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-base\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="94d9cedd04b124aed044ac71c451a292856d854c">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-base-9.0.2_abea87e5aa8461d4c0339a4914fb3ce004ecf231\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -183,30 +264,12 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="78fe5eb38b803e82f80a8403816f81302a952ce4">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_dcdf1c0d1cea4e55d55cf467086673be19b62a06\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-auth\9.0.2\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.1"
         sha1="fa472b7cbd3897bf6bed6068ac0b00e494987688">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-auth-9.0.2_a17e343ed60e3bc73a1351ea730cafddec934466\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\24.2.1\support-annotations-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-24.2.1_452cb8fd44d53e428772f29d98c484518763e92d\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -219,15 +282,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-24.2.1_05847d3c8bfa6e21aab0db822e9170abbe141a3d\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\9.0.2\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -237,29 +291,11 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-media-compat-24.2.1_9836c03bd7be0611e65783a6442007734b3a3565\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.1\jars\libs\internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_d0957bff193554dd98769048240650843a7ae831\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.1"
-        sha1="27cb1b19935a9bce8d4227ebf2765bc53cf9ee78">
+        sha1="c7a5de0c5ed84b0930064a717066322550f58cb2">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_94282cce98495058b7592d5528bcb9f58b76fd11\classes.dex" />
     </item>
     <item
@@ -270,15 +306,6 @@
         revision="25.0.1"
         sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-24.2.1_45c54ff3622917a72efee7241b00c1ffe1ca3330\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-auth-common\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="568d5bda0b4d51f90d978ace369bb9ad024d2057">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-auth-common-9.0.2_412416ed747db13530008d35ab7235bf5f06480c\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -297,33 +324,6 @@
         revision="25.0.1"
         sha1="e03f47f3d1017a093bb3239d4ec47c3447f40744">
         <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-design-24.2.1_95fe7936d4d8073f0843aa0942ded35066be67c6\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\24.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="c5e6490573cd2cc8018417f60ddd251138b6ed61">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-cardview-v7-24.2.1_3e03e59383480a7c9050b72aed335f572dd4052b\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.google.firebase\firebase-iid\9.0.2\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="b3d0809a742c5f768c6aa9efc6decd5c1d6cd227">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.firebase-firebase-iid-9.0.2_a6a754e20a23631b8ed94fbc091e4560254fd043\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.1\jars\libs\internal_impl-24.2.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="25.0.1"
-        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
-        <dex dex="C:\Users\bradylz\Documents\GitHub\Save-Your-Data-CSSE483\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.1_1098657203ee5f1c84dae16a2194d13dd6d2eb4f\classes.dex" />
     </item>
 
 </items>

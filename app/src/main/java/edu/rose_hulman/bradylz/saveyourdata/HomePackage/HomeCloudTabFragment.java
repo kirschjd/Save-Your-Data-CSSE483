@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.rose_hulman.bradylz.saveyourdata.File;
 import edu.rose_hulman.bradylz.saveyourdata.FileAdapter;
 import edu.rose_hulman.bradylz.saveyourdata.R;
 
@@ -31,6 +32,7 @@ public class HomeCloudTabFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private FileAdapter mAdapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -65,6 +67,10 @@ public class HomeCloudTabFragment extends Fragment {
         }
     }
 
+    public void add(File file) {
+        mAdapter.add(file);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,8 +80,8 @@ public class HomeCloudTabFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.home_cloud_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        FileAdapter adapter = new FileAdapter(getContext(), recyclerView);
-        recyclerView.setAdapter(adapter);
+        mAdapter = new FileAdapter(getContext(), recyclerView);
+        recyclerView.setAdapter(mAdapter);
         recyclerView.scrollToPosition(0);
         return view;
     }
@@ -94,7 +100,7 @@ public class HomeCloudTabFragment extends Fragment {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRoomFileInteractionListener");
         }
     }
 

@@ -2,20 +2,22 @@ package edu.rose_hulman.bradylz.saveyourdata;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.TextView;
 
 import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by bradylz on 1/20/2017.
  */
 
 public class File implements Parcelable{
-    private String title;
+    private String name;
     private String description;
-    private Integer imageID;
     private String filePath;
     private String key;
+    private Map<String, Boolean> owners;
 
     public String getFilePath() {
         return filePath;
@@ -34,17 +36,20 @@ public class File implements Parcelable{
         return key;
     }
 
+    public File() {
 
-    public File(String title, String description, Integer imageID) {
-        this.title = title;
+    }
+
+    public File(String title, String description, String uid) {
+        this.name = title;
         this.description = description;
-        this.imageID = imageID;
+        owners = new HashMap<>();
+        owners.put(uid, true);
     }
 
     protected File(Parcel in) {
-        title = in.readString();
+        name = in.readString();
         description = in.readString();
-        imageID = in.readInt();
     }
 
     public static final Creator<File> CREATOR = new Creator<File>() {
@@ -59,12 +64,12 @@ public class File implements Parcelable{
         }
     };
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -75,14 +80,6 @@ public class File implements Parcelable{
         this.description = description;
     }
 
-    public Integer getImageID() {
-        return imageID;
-    }
-
-    public void setImageID(Integer imageID) {
-        this.imageID = imageID;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -90,8 +87,7 @@ public class File implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(title);
+        parcel.writeString(name);
         parcel.writeString(description);
-        parcel.writeInt(imageID);
     }
 }

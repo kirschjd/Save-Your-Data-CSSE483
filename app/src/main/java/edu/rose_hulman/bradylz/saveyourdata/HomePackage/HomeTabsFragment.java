@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AlertDialog;
@@ -18,6 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import edu.rose_hulman.bradylz.saveyourdata.Constants;
 import edu.rose_hulman.bradylz.saveyourdata.File;
@@ -49,8 +51,12 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
     private FragmentTabHost mTabHost;
     private Context mContext;
     private FileAdapter mAdapter;
+    private String mUid;
     //To identify photo(0) / video(1) / text file (2)
     private int optionsIndex;
+
+    //The tabs of the tab host
+    HomeDownloadsTabFragment mDownloads;
 
     public HomeTabsFragment() {
         // Required empty public constructor
@@ -106,7 +112,10 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
         mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realtabcontent);
 
         //Adding in the downloads tab
-        mTabHost.addTab(mTabHost.newTabSpec("downloads").setIndicator(getString(R.string.home_downloads_tab)), HomeDownloadsTabFragment.class, null);
+        mDownloads = new HomeDownloadsTabFragment();
+        mTabHost.addTab(mTabHost.newTabSpec("downloads").setIndicator(getString(R.string.home_downloads_tab)), mDownloads.getClass(), null);
+        Log.d(Constants.TAG, "HTF Right before setting uid: " + mUid);
+        mDownloads.setUid(mUid);
 
         //Adding in the cloud tab
         mTabHost.addTab(mTabHost.newTabSpec("cloud").setIndicator(getString(R.string.home_cloud_tab)), HomeCloudTabFragment.class, null);
@@ -114,7 +123,15 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
         //Adding in the cloud tab
         mTabHost.addTab(mTabHost.newTabSpec("general").setIndicator(getString(R.string.home_general_tab)), HomeGeneralTabFragment.class, null);
 
+        // Setting the uid in the file adapter
+        // mAdapter.setUid(mUid);
+
         return view;
+    }
+
+    public void setUid(String uid) {
+        mUid = uid;
+        Log.d(Constants.TAG, "Home tabs fragment Uid: " + mUid);
     }
 
     private void showOptions() {
@@ -172,7 +189,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRoomFileInteractionListener");
         }
     }
 
@@ -187,26 +204,25 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
 
     }
 
-    public void updateAdapter() {
-        String tag = mTabHost.getTag().toString();
-        Fragment ft = getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-
+    //Finding the current tab of the fragment tab host
+    public Fragment findCurrentFragment() {
+        String tag = mTabHost.getCurrentTabTag();
         switch (tag){
             case "downloads":
-//                HomeDownloadsTabFragment hdtf = (HomeDownloadsTabFragment)
-//                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-//                mAdapter = hdtf.getAdapter();
-                break;
+                HomeDownloadsTabFragment hdtf = (HomeDownloadsTabFragment)
+                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                return hdtf;
             case "cloud":
-
-                break;
+                HomeCloudTabFragment hctf = (HomeCloudTabFragment)
+                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                return hctf;
             case "general":
                 HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
                         getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                mAdapter = hgtf.getAdapter();
-                break;
+                return hgtf;
             default:
                 Log.d(Constants.TAG, "couldn't get tag");
+                return null;
         }
     }
 
@@ -234,7 +250,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
         final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
         if (file != null) {
             // pre-populate
-            titleEditText.setText(file.getTitle());
+            titleEditText.setText(file.getName());
             descriptionEditText.setText(file.getDescription());
 
             TextWatcher textWatcher = new TextWatcher() {
@@ -265,14 +281,40 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (file == null) {
+                    //Creating the new file to add
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
+                    File newFile = new File(name, description, mUid);
 
-                    if(optionsIndex == 0) {
-                        Intent intent = new Intent(Intent.ACTION_PICK,
-                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, 0);
+                    // Checking which fragment we're in to add the file
+                    String tag = mTabHost.getCurrentTabTag();
+                    switch (tag){
+                        case "downloads":
+                            //mDownloads.add(newFile);
+                            HomeDownloadsTabFragment downloads = (HomeDownloadsTabFragment)
+                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                            break;
+                        case "cloud":
+                            HomeCloudTabFragment hctf = (HomeCloudTabFragment)
+                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                            hctf.add(newFile);
+                            break;
+                        case "general":
+                            HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
+                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                            hgtf.add(newFile);
+                            break;
+                        default:
+                            Log.d(Constants.TAG, "couldn't get tag");
+                            break;
                     }
+                    //mAdapter.add(new File(name, description, mUid));
+
+//                    if(optionsIndex == 0) {
+//                        Intent intent = new Intent(Intent.ACTION_PICK,
+//                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                        startActivityForResult(intent, 0);
+//                    }
                     //mAdapter.add(new File(name, description, android.R.drawable.btn_star));
                 }
             }

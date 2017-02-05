@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -14,10 +13,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by kirschjd on 1/22/2017.
@@ -26,71 +28,51 @@ import java.util.ArrayList;
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<File> mFiles = new ArrayList<>();
+    private ArrayList<File> mFiles;
     private RecyclerView mRecyclerView;
-    private DatabaseReference mUserRef;
-    private FirebaseStorage mStorage;
-    StorageReference mStorageRef;
 
-    public FileAdapter(Context context, RecyclerView recyclerView){
+    //References to our firebase
+    private DatabaseReference mFileRef;
+    private DatabaseReference mOwnerRef;
+
+    private FirebaseStorage mStorage;
+    private StorageReference mStorageRef;
+    private Query mQuery;
+    private String mUid;
+
+    public FileAdapter(Context context, RecyclerView recyclerView) {
         mContext = context;
         mRecyclerView = recyclerView;
+        mFiles = new ArrayList<>();
+
+        // Hard coded uid for testing purposes
+        mUid = "RgTWQA1UhVXQcdhUiE8gLFSXbXA2";
 
         //Linking to firebase
-        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        mUserRef.addChildEventListener(new UserEventListener());
+        mFileRef = FirebaseDatabase.getInstance().getReference().child("file");
+        // mFileRef.addChildEventListener(new FileEventListener());
+
+        //Initializing the query to get our own files showing only
+        mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
+        mQuery.addChildEventListener(new FileEventListener());
+
+        mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owners").child(mUid);
 
         // Create a storage reference from our app
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReferenceFromUrl("gs://save-your-data-csse483.appspot.com");
 
-        //Hard coded 'files' to check recycler views are working
-        for(int i = 0; i < 5; i++) {
-            mFiles.add(new File("File " + i, "Description", android.R.drawable.btn_default));
-        }
-        mFiles.add(new File("File ", "Description", android.R.drawable.btn_default));
+        // Create a child reference
+        // imagesRef now points to "images"
+        StorageReference imagesRef = mStorageRef.child("images");
     }
 
-    public class UserEventListener implements ChildEventListener{
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
+    public void setUid(String uid) {
+        // mUid = uid;
+        Log.d(Constants.TAG, "Adapter Uid: " + mUid);
     }
 
-    public void update(File file, String title, String description) {
-        file.setTitle(title);
-        file.setDescription(description);
-
-        //mFileRef.child(file.getKey()).setValue(file);
-    }
-
-    public void add(File file) {
-        //mFileRef.push().setValue(file);
-    }
-
-    class FilesChildEventListener implements ChildEventListener {
+    public class FileEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -102,27 +84,30 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//            String key = dataSnapshot.getKey();
-//            MovieQuote updatedMovieQuote = dataSnapshot.getValue(MovieQuote.class);
-//            for (MovieQuote mq : mMovieQuotes){
-//                if(mq.getKey().equals(key)){
-//                    mq.setValues(updatedMovieQuote);
-//                    notifyDataSetChanged();
-//                    return;
-//                }
-//            }
+            File file = dataSnapshot.getValue(File.class);
+            String keyToFind = dataSnapshot.getKey();
+            file.setKey(keyToFind);
+
+            for(int i = 0; i < mFiles.size(); i++) {
+                if(mFiles.get(i).getKey().equals(keyToFind)) {
+                    mFiles.set(i, file);
+                    notifyDataSetChanged();
+                    return;
+                }
+            }
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-//            String key = dataSnapshot.getKey();
-//            for (MovieQuote mq : mMovieQuotes){
-//                if(mq.getKey().equals(key)){
-//                    mMovieQuotes.remove(mq);
-//                    notifyDataSetChanged();
-//                    return;
-//                }
-//            }
+            String keyToRemove = dataSnapshot.getKey();
+
+            for(int i = 0; i < mFiles.size(); i++) {
+                if(mFiles.get(i).getKey().equals(keyToRemove)) {
+                    mFiles.remove(i);
+                    notifyDataSetChanged();
+                    return;
+                }
+            }
         }
 
         @Override
@@ -132,8 +117,25 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-            Log.e(Constants.TAG, "Database error: " + databaseError);
+
         }
+    }
+
+    public void add(File file) {
+        Log.d(Constants.TAG, "File being inserted : " + file.toString());
+        mFileRef.push().setValue(file);
+        mFileRef.keepSynced(true);
+    }
+
+    public void remove(File file) {
+        mFileRef.child(file.getKey()).removeValue();
+    }
+
+    public void update(File file, String newCaption, String newURL) {
+//        pic.setCaption(newCaption);
+//        pic.setUrl(newURL);
+//        mPicsRefs.child(pic.getKey()).setValue(pic);
+//        mPicsRefs.child(pic.getKey()).keepSynced(true);
     }
 
     @Override
@@ -145,8 +147,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         File file = mFiles.get(position);
-        holder.nameTextView.setText(file.getTitle());
-        holder.pictureImageView.setImageResource(file.getImageID());
+        holder.nameTextView.setText(file.getName());
         holder.descriptionTextView.setText(file.getDescription());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +156,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
                 //TODO: Something
             }
         });
+    }
+
+    public void firebasePush(String fileName, String fileDescription) {
+        // Create a new auto-ID for a course in the courses path
+        DatabaseReference ref = mFileRef.push();
+        Log.d(Constants.TAG, "file ref push key: " + ref);
+        Log.d(Constants.TAG, "mUid: " + mUid);
+
+        // Add the course to the courses path
+        ref.setValue(new File(fileName, fileDescription, mUid));
+
+        // Add the course to the owners path
+        Map<String, Object> map = new HashMap<>();
+        map.put(ref.getKey(), true);
+        // See https://www.firebase.com/docs/android/guide/saving-data.html for this method.
+        mOwnerRef.child(Owner.FILES).updateChildren(map);
     }
 
     @Override
@@ -166,13 +183,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
         private TextView nameTextView;
         private TextView descriptionTextView;
-        private ImageView pictureImageView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            nameTextView = (TextView) itemView.findViewById(R.id.file_title);
-            descriptionTextView = (TextView) itemView.findViewById(R.id.file_description);
-            pictureImageView = (ImageView) itemView.findViewById(R.id.file_thumbnail);
+            nameTextView = (TextView) itemView.findViewById(R.id.home_file_title);
+            descriptionTextView = (TextView) itemView.findViewById(R.id.home_file_description);
         }
     }
 }

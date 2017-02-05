@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import edu.rose_hulman.bradylz.saveyourdata.File;
 import edu.rose_hulman.bradylz.saveyourdata.FileAdapter;
 import edu.rose_hulman.bradylz.saveyourdata.R;
 
@@ -57,6 +58,10 @@ public class HomeGeneralTabFragment extends Fragment {
         return fragment;
     }
 
+    public void add(File file) {
+        mAdapter.add(file);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +104,7 @@ public class HomeGeneralTabFragment extends Fragment {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRoomFileInteractionListener");
         }
     }
 
