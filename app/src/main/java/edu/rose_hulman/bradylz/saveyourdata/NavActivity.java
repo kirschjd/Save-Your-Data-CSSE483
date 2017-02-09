@@ -1,29 +1,22 @@
 package edu.rose_hulman.bradylz.saveyourdata;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -43,7 +36,6 @@ import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeDownloadsTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeGeneralTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeTabsFragment;
-import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomAdapter;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomContentTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomFragment;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomPeopleTabFragment;
@@ -51,9 +43,9 @@ import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomTabsFragment;
 
 public class NavActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
                                                                 HomeTabsFragment.OnFragmentInteractionListener,
-                                                                HomeDownloadsTabFragment.OnFragmentInteractionListener,
-                                                                HomeGeneralTabFragment.OnFragmentInteractionListener,
-                                                                HomeCloudTabFragment.OnFragmentInteractionListener,
+                                                                HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener,
+                                                                HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
+                                                                HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener,
                                                                 RoomPeopleTabFragment.OnFragmentInteractionListener,
                                                                 RoomContentTabFragment.OnFragmentInteractionListener,
                                                                 RoomTabsFragment.OnFragmentInteractionListener,
@@ -61,7 +53,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                                                                 GoogleApiClient.OnConnectionFailedListener,
                                                                 RoomFragment.OnRoomFileInteractionListener{
 
-    public static final int REQUEST_CODE_INPUT = 4;
     private static final int RC_GOOGLE_LOGIN = 4;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -70,6 +61,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
     private String mUid;
+    public static String PREFS = "PREFS";
+    public static String KEY_UID = "KEY_UID";
+    private boolean onAuthCalled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +72,8 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Log.d(Constants.TAG, "about to initialize listeners");
+        Log.d(Constants.TAG, "In Nav Activity onCreate");
+
         mAuth = FirebaseAuth.getInstance();
         initializeListeners();
         setupGoogleSignIn();
@@ -87,7 +82,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -110,21 +105,29 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     private void initializeListeners() {
-        Log.d(Constants.TAG, "initializing listeners");
+        Log.d(Constants.TAG, "Top of initialize listeners");
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 //Get user and uid to pass into fragments
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 mUid = user.getUid();
-                Log.d(Constants.TAG, "Activity Uid: " + mUid);
+
+                Log.d(Constants.TAG, "In authlistener setup");
                 Log.d(Constants.TAG, "Current User: " + user);
 
                 if (user != null) {
-                    Log.d(Constants.TAG, "home tabs");
-                    switchToHomeTabsFragment(mUid);
+                    if(!onAuthCalled) {
+                        onAuthCalled = true;
+                        Log.d(Constants.TAG, "In boolean if statement");
+                        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString(KEY_UID, mUid);
+                        editor.commit();
+
+                        switchToHomeTabsFragment(mUid);
+                    }
                 } else {
-                    Log.d(Constants.TAG, "login");
                     switchToLoginFragment();
                 }
             }
@@ -155,32 +158,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         ft.commit();
     }
 
-    private void switchToHomeTabsFragment(String uid) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        HomeTabsFragment htf = new HomeTabsFragment();
-        htf.setContext(this);
-        ft.replace(R.id.content_nav, htf, "Home Tabs");
-        ft.addToBackStack("home tabs");
-
-        //Show the nav bar if currently disabled
-        showNavBar(true);
-        htf.setUid(uid);
-
-        ft.commit();
-    }
-
-    private void switchToRoomFragment(String uid) {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        RoomFragment roomFrag = new RoomFragment();
-        ft.addToBackStack("previous");
-        ft.replace(R.id.content_nav, roomFrag);
-        ft.commit();
-
-        //Show the nav bar if currently disabled
-        showNavBar(true);
-        roomFrag.setUid(uid);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -201,6 +178,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d(Constants.TAG, "In on start");
         mAuth.addAuthStateListener(mAuthListener);
     }
 
@@ -220,7 +198,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public void onGoogleLogin() {
-        //DONE: Log user in with Google account
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_GOOGLE_LOGIN);
     }
@@ -277,19 +254,31 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         return super.onOptionsItemSelected(item);
     }
 
+    private void switchToHomeTabsFragment(String uid) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        HomeTabsFragment htf = new HomeTabsFragment();
+        htf.setContext(this);
+        ft.replace(R.id.content_nav, htf, "Home Tabs");
+        ft.addToBackStack("home tabs");
+
+        //Show the nav bar if currently disabled
+        showNavBar(true);
+        htf.setUid(uid);
+
+        ft.commit();
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        RoomFragment switchTo = null;
+        Fragment switchTo = null;
         switch(item.getItemId()) {
             case R.id.nav_home:
-                switchToHomeTabsFragment(mUid);
+                switchTo = new HomeTabsFragment();
                 break;
             case R.id.nav_room:
                 switchTo = new RoomFragment();
-                //switchToRoomFragment(mUid);
-                switchTo.setUid(mUid);
                 break;
             case R.id.nav_settings:
                 Intent intent = new Intent(Settings.ACTION_SETTINGS);
@@ -316,7 +305,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void OnHomeDownloadsFileInteraction(File file) {
 
     }
 
@@ -327,6 +316,21 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public void onRoomFileInteraction(File file) {
+
+    }
+
+    @Override
+    public void onHomeCloudFileInteraction(File file) {
+
+    }
+
+    @Override
+    public void onHomeGeneralFileInteraction(File file) {
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
     }
 }

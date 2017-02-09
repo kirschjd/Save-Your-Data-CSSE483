@@ -73,8 +73,8 @@ public class RoomContentTabFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.room_content_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        FileAdapter adapter = new FileAdapter(getContext(), recyclerView);
-        recyclerView.setAdapter(adapter);
+        // FileAdapter adapter = new FileAdapter(getContext(), recyclerView);
+        // recyclerView.setAdapter(adapter);
         recyclerView.scrollToPosition(0);
         return view;
     }

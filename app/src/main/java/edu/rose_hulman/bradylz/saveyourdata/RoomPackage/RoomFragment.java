@@ -83,7 +83,6 @@ public class RoomFragment extends Fragment {
         mAdapter = new RoomAdapter(getContext(), new OnRoomFileInteractionListener() {
             @Override
             public void onRoomFileInteraction(final File file) {
-                Log.d(Constants.TAG, "Clicking");
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle(R.string.download_prompt_title);
                 builder.setNegativeButton(android.R.string.cancel, null);
@@ -98,8 +97,6 @@ public class RoomFragment extends Fragment {
         });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(0);
-        Log.d(Constants.TAG, "Room Fragment: " + mUid);
-        mAdapter.setUid(mUid);
         return view;
     }
 

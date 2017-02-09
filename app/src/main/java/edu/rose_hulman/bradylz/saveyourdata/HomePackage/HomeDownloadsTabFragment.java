@@ -1,15 +1,20 @@
 package edu.rose_hulman.bradylz.saveyourdata.HomePackage;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import edu.rose_hulman.bradylz.saveyourdata.Constants;
 import edu.rose_hulman.bradylz.saveyourdata.File;
@@ -20,7 +25,7 @@ import edu.rose_hulman.bradylz.saveyourdata.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeDownloadsTabFragment.OnFragmentInteractionListener} interface
+ * {@link OnHomeDownloadsFileSelectedInteractionListener} interface
  * to handle interaction events.
  * Use the {@link HomeDownloadsTabFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -34,11 +39,11 @@ public class HomeDownloadsTabFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private String mUid;
     private FileAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private Context mContext;
 
-    private OnFragmentInteractionListener mListener;
+    private OnHomeDownloadsFileSelectedInteractionListener mListener;
 
     public HomeDownloadsTabFragment() {
         // Required empty public constructor
@@ -71,13 +76,6 @@ public class HomeDownloadsTabFragment extends Fragment {
         }
     }
 
-    public void setUid(String uid) {
-        mUid = uid;
-        Log.d(Constants.TAG, "Adapter: " + mAdapter);
-        Log.d(Constants.TAG, "Downloads Uid: " + mUid);
-
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -87,32 +85,53 @@ public class HomeDownloadsTabFragment extends Fragment {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.home_downloads_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
-        mAdapter = new FileAdapter(getContext(), mRecyclerView);
+        mAdapter = new FileAdapter(getContext(), mRecyclerView, new OnHomeDownloadsFileSelectedInteractionListener() {
+            @Override
+            public void OnHomeDownloadsFileInteraction(File file) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_detail, null, false);
+                builder.setView(view);
+
+                //Getting which type of file it is to populate according layout feature
+                int fileType = file.getType();
+                String path = file.getFilePath();
+                switch(fileType) {
+                    case 0:
+
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    default:
+                        //This means there is some sort of error
+                        break;
+                }
+
+                builder.create().show();
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(0);
-        Log.d(Constants.TAG, "Right before Uid: " + mUid);
-
-        //mAdapter.setUid(mUid);
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(File file) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.OnHomeDownloadsFileInteraction(file);
         }
     }
 
-    public void add(File file) {
-        Log.d(Constants.TAG, "Adapter for adding: " + mAdapter);
-        mAdapter.add(file);
-    }
+//    public void add(File file) {
+//        mAdapter.add(file);
+//    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnHomeDownloadsFileSelectedInteractionListener) {
+            mListener = (OnHomeDownloadsFileSelectedInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnRoomFileInteractionListener");
@@ -135,8 +154,12 @@ public class HomeDownloadsTabFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnHomeDownloadsFileSelectedInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void OnHomeDownloadsFileInteraction(File file);
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
     }
 }

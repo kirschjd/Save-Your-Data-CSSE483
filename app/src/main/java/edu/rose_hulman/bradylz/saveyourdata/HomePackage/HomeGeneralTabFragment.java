@@ -18,7 +18,7 @@ import edu.rose_hulman.bradylz.saveyourdata.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeGeneralTabFragment.OnFragmentInteractionListener} interface
+ * {@link OnHomeGeneralFileInteractionSelectedListener} interface
  * to handle interaction events.
  * Use the {@link HomeGeneralTabFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -33,7 +33,7 @@ public class HomeGeneralTabFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private OnHomeGeneralFileInteractionSelectedListener mListener;
     private FileAdapter mAdapter;
 
     public HomeGeneralTabFragment() {
@@ -80,7 +80,12 @@ public class HomeGeneralTabFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.home_general_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        mAdapter = new FileAdapter(getContext(), recyclerView);
+        mAdapter = new FileAdapter(getContext(), recyclerView, new HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener() {
+            @Override
+            public void OnHomeDownloadsFileInteraction(File file) {
+                //TODO: copy from other method
+            }
+        });
         recyclerView.setAdapter(mAdapter);
         recyclerView.scrollToPosition(0);
         return view;
@@ -91,17 +96,17 @@ public class HomeGeneralTabFragment extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(File file) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onHomeGeneralFileInteraction(file);
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnHomeGeneralFileInteractionSelectedListener) {
+            mListener = (OnHomeGeneralFileInteractionSelectedListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnRoomFileInteractionListener");
@@ -124,8 +129,8 @@ public class HomeGeneralTabFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnHomeGeneralFileInteractionSelectedListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onHomeGeneralFileInteraction(File file);
     }
 }

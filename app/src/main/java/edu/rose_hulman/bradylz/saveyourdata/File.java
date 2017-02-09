@@ -18,6 +18,16 @@ public class File implements Parcelable{
     private String filePath;
     private String key;
     private Map<String, Boolean> owners;
+    //To identify photo(0) / video(1) / text file (2)
+    private int type;
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
 
     public String getFilePath() {
         return filePath;
@@ -40,11 +50,12 @@ public class File implements Parcelable{
 
     }
 
-    public File(String title, String description, String uid) {
+    public File(String title, String description, String uid, int type) {
         this.name = title;
         this.description = description;
         owners = new HashMap<>();
         owners.put(uid, true);
+        this.type = type;
     }
 
     protected File(Parcel in) {

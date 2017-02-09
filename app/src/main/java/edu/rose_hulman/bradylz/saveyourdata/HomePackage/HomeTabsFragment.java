@@ -2,7 +2,6 @@ package edu.rose_hulman.bradylz.saveyourdata.HomePackage;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,9 +17,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import edu.rose_hulman.bradylz.saveyourdata.Constants;
 import edu.rose_hulman.bradylz.saveyourdata.File;
 import edu.rose_hulman.bradylz.saveyourdata.FileAdapter;
@@ -35,9 +31,9 @@ import edu.rose_hulman.bradylz.saveyourdata.R;
  * Use the {@link HomeTabsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragment.OnFragmentInteractionListener,
-                                                            HomeGeneralTabFragment.OnFragmentInteractionListener,
-                                                            HomeCloudTabFragment.OnFragmentInteractionListener{
+public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener,
+        HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
+        HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -54,9 +50,12 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
     private String mUid;
     //To identify photo(0) / video(1) / text file (2)
     private int optionsIndex;
+    private boolean onCreateViewCalled = false;
 
     //The tabs of the tab host
     HomeDownloadsTabFragment mDownloads;
+    HomeCloudTabFragment mCloud;
+    HomeGeneralTabFragment mGeneral;
 
     public HomeTabsFragment() {
         // Required empty public constructor
@@ -96,42 +95,46 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home_tabs, container, false);
+        if(!onCreateViewCalled) {
+            // Inflate the layout for this fragment
+            View view = inflater.inflate(R.layout.fragment_home_tabs, container, false);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showOptions();
-            }
-        });
+            FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showOptions();
+                }
+            });
 
-        //Setting up the tabs
-        mTabHost = (FragmentTabHost) view.findViewById(android.R.id.tabhost);
-        mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realtabcontent);
+            //Setting up the tabs
+            mTabHost = (FragmentTabHost) view.findViewById(android.R.id.tabhost);
+            mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realtabcontent);
 
-        //Adding in the downloads tab
-        mDownloads = new HomeDownloadsTabFragment();
-        mTabHost.addTab(mTabHost.newTabSpec("downloads").setIndicator(getString(R.string.home_downloads_tab)), mDownloads.getClass(), null);
-        Log.d(Constants.TAG, "HTF Right before setting uid: " + mUid);
-        mDownloads.setUid(mUid);
+            //Adding in the downloads tab
+            mDownloads = new HomeDownloadsTabFragment();
+            mTabHost.addTab(mTabHost.newTabSpec("downloads").setIndicator(getString(R.string.home_downloads_tab)), mDownloads.getClass(), null);
 
-        //Adding in the cloud tab
-        mTabHost.addTab(mTabHost.newTabSpec("cloud").setIndicator(getString(R.string.home_cloud_tab)), HomeCloudTabFragment.class, null);
+            //Adding in the cloud tab
+            mCloud = new HomeCloudTabFragment();
+            mTabHost.addTab(mTabHost.newTabSpec("cloud").setIndicator(getString(R.string.home_cloud_tab)), mCloud.getClass(), null);
+            Log.d(Constants.TAG, "Cloud when adding: " + mCloud);
 
-        //Adding in the cloud tab
-        mTabHost.addTab(mTabHost.newTabSpec("general").setIndicator(getString(R.string.home_general_tab)), HomeGeneralTabFragment.class, null);
+            //Adding in the cloud tab
+            mTabHost.addTab(mTabHost.newTabSpec("general").setIndicator(getString(R.string.home_general_tab)), HomeGeneralTabFragment.class, null);
 
-        // Setting the uid in the file adapter
-        // mAdapter.setUid(mUid);
+            // Setting the uid in the file adapter
+            // mAdapter.setUid(mUid);
 
-        return view;
+            return view;
+        } else {
+            onCreateViewCalled = true;
+            return getView();
+        }
     }
 
     public void setUid(String uid) {
         mUid = uid;
-        Log.d(Constants.TAG, "Home tabs fragment Uid: " + mUid);
     }
 
     private void showOptions() {
@@ -148,7 +151,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             @Override
             public void onClick(View v) {
                 optionsIndex = 0;
-                showAddEditDialog(null);
+                showAddEditDialog(null, mUid, optionsIndex, getActivity());
             }
         });
 
@@ -158,7 +161,7 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             @Override
             public void onClick(View v) {
                 optionsIndex = 1;
-                showAddEditDialog(null);
+                showAddEditDialog(null, mUid, optionsIndex, getActivity());
             }
         });
 
@@ -168,86 +171,25 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
             @Override
             public void onClick(View v) {
                 optionsIndex = 2;
-                showAddEditDialog(null);
+                showAddEditDialog(null, mUid, optionsIndex, getActivity());
             }
         });
 
         builder.create().show();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnRoomFileInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    //Finding the current tab of the fragment tab host
-    public Fragment findCurrentFragment() {
-        String tag = mTabHost.getCurrentTabTag();
-        switch (tag){
-            case "downloads":
-                HomeDownloadsTabFragment hdtf = (HomeDownloadsTabFragment)
-                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                return hdtf;
-            case "cloud":
-                HomeCloudTabFragment hctf = (HomeCloudTabFragment)
-                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                return hctf;
-            case "general":
-                HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
-                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                return hgtf;
-            default:
-                Log.d(Constants.TAG, "couldn't get tag");
-                return null;
-        }
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-
-    private void showAddEditDialog(final File file) {
+    public void showAddEditDialog(final File file, final String uid, final int optionsIndex, Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle(getString(file == null ? R.string.dialog_add_title : R.string.dialog_update_title));
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_add, null, false);
         builder.setView(view);
         final EditText titleEditText = (EditText) view.findViewById(R.id.dialog_add_title);
         final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
+
+
+        Log.d(Constants.TAG, "Cloud: " + mCloud);
+        mAdapter = mCloud.getAdapter();
+
         if (file != null) {
             // pre-populate
             titleEditText.setText(file.getName());
@@ -284,43 +226,170 @@ public class HomeTabsFragment extends Fragment implements HomeDownloadsTabFragme
                     //Creating the new file to add
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
-                    File newFile = new File(name, description, mUid);
 
-                    // Checking which fragment we're in to add the file
-                    String tag = mTabHost.getCurrentTabTag();
-                    switch (tag){
-                        case "downloads":
-                            //mDownloads.add(newFile);
-                            HomeDownloadsTabFragment downloads = (HomeDownloadsTabFragment)
-                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                            break;
-                        case "cloud":
-                            HomeCloudTabFragment hctf = (HomeCloudTabFragment)
-                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                            hctf.add(newFile);
-                            break;
-                        case "general":
-                            HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
-                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-                            hgtf.add(newFile);
-                            break;
-                        default:
-                            Log.d(Constants.TAG, "couldn't get tag");
-                            break;
-                    }
-                    //mAdapter.add(new File(name, description, mUid));
+                    File newFile = new File(name, description, uid, optionsIndex);
 
-//                    if(optionsIndex == 0) {
-//                        Intent intent = new Intent(Intent.ACTION_PICK,
-//                                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                        startActivityForResult(intent, 0);
-//                    }
-                    //mAdapter.add(new File(name, description, android.R.drawable.btn_star));
+                    Log.d(Constants.TAG, "M Adapter: " + mAdapter);
+                    mAdapter.add(newFile);
                 }
             }
         });
+
         builder.setNegativeButton(android.R.string.cancel, null);
 
         builder.create().show();
     }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnRoomFileInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    //Finding the current tab of the fragment tab host
+    public Fragment findCurrentFragment() {
+        String tag = mTabHost.getCurrentTabTag();
+        switch (tag){
+            case "downloads":
+                HomeDownloadsTabFragment hdtf = (HomeDownloadsTabFragment)
+                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                return hdtf;
+            case "cloud":
+                HomeCloudTabFragment hctf = (HomeCloudTabFragment)
+                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                return hctf;
+            case "general":
+                HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
+                        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+                return hgtf;
+            default:
+                Log.d(Constants.TAG, "couldn't get tag");
+                return null;
+        }
+    }
+
+    @Override
+    public void onHomeCloudFileInteraction(File file) {
+
+    }
+
+    @Override
+    public void OnHomeDownloadsFileInteraction(File file) {
+
+    }
+
+    @Override
+    public void onHomeGeneralFileInteraction(File file) {
+
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+//    private void showAddEditDialog(final File file) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+//        builder.setTitle(getString(file == null ? R.string.dialog_add_title : R.string.dialog_update_title));
+//        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_add, null, false);
+//        builder.setView(view);
+//        final EditText titleEditText = (EditText) view.findViewById(R.id.dialog_add_title);
+//        final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
+//        if (file != null) {
+//            // pre-populate
+//            titleEditText.setText(file.getName());
+//            descriptionEditText.setText(file.getDescription());
+//
+//            TextWatcher textWatcher = new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                    // empty
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                    // empty
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    String name = titleEditText.getText().toString();
+//                    String description = descriptionEditText.getText().toString();
+//                    //TODO: Commit the file to firebase after this step
+//                    mAdapter.update(file, name, description);
+//                }
+//            };
+//
+//            titleEditText.addTextChangedListener(textWatcher);
+//            descriptionEditText.addTextChangedListener(textWatcher);
+//        }
+//
+//        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                if (file == null) {
+//                    //Creating the new file to add
+//                    String name = titleEditText.getText().toString();
+//                    String description = descriptionEditText.getText().toString();
+//
+//                    File newFile = new File(name, description, mUid, optionsIndex);
+//
+//                    // Checking which fragment we're in to add the file
+//                    String tag = mTabHost.getCurrentTabTag();
+//                    switch (tag){
+//                        case "downloads":
+//                            Log.d(Constants.TAG, "Downloads Fragment when adding: " + mDownloads.getId());
+//                            mDownloads.add(newFile);
+//                            //HomeDownloadsTabFragment downloads = (HomeDownloadsTabFragment)
+//                            //        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+//                            break;
+//                        case "cloud":
+//                            HomeCloudTabFragment hctf = (HomeCloudTabFragment)
+//                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+//                            hctf.add(newFile);
+//                            break;
+//                        case "general":
+//                            HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
+//                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
+//                            hgtf.add(newFile);
+//                            break;
+//                        default:
+//                            Log.d(Constants.TAG, "Couldn't get tag");
+//                            break;
+//                    }
+//                }
+//            }
+//        });
+//        builder.setNegativeButton(android.R.string.cancel, null);
+//
+//        builder.create().show();
+//    }
 }

@@ -1,14 +1,18 @@
 package edu.rose_hulman.bradylz.saveyourdata.HomePackage;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import edu.rose_hulman.bradylz.saveyourdata.File;
 import edu.rose_hulman.bradylz.saveyourdata.FileAdapter;
@@ -18,7 +22,7 @@ import edu.rose_hulman.bradylz.saveyourdata.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeCloudTabFragment.OnFragmentInteractionListener} interface
+ * {@link OnHomeCloudFileInteractionSelectedListener} interface
  * to handle interaction events.
  * Use the {@link HomeCloudTabFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -34,10 +38,14 @@ public class HomeCloudTabFragment extends Fragment {
     private String mParam2;
     private FileAdapter mAdapter;
 
-    private OnFragmentInteractionListener mListener;
+    private OnHomeCloudFileInteractionSelectedListener mListener;
 
     public HomeCloudTabFragment() {
         // Required empty public constructor
+    }
+
+    public FileAdapter getAdapter() {
+        return mAdapter;
     }
 
     /**
@@ -80,24 +88,29 @@ public class HomeCloudTabFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.home_cloud_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        mAdapter = new FileAdapter(getContext(), recyclerView);
+        mAdapter = new FileAdapter(getContext(), recyclerView, new HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener() {
+            @Override
+            public void OnHomeDownloadsFileInteraction(File file) {
+                //TODO: copy similar method from downloads fragment
+            }
+        });
         recyclerView.setAdapter(mAdapter);
         recyclerView.scrollToPosition(0);
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed(File file) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onHomeCloudFileInteraction(file);
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnHomeCloudFileInteractionSelectedListener) {
+            mListener = (OnHomeCloudFileInteractionSelectedListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnRoomFileInteractionListener");
@@ -120,8 +133,8 @@ public class HomeCloudTabFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnHomeCloudFileInteractionSelectedListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onHomeCloudFileInteraction(File file);
     }
 }

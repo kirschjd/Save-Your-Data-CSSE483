@@ -1,6 +1,8 @@
 package edu.rose_hulman.bradylz.saveyourdata;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,6 +23,10 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeDownloadsTabFragment;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by kirschjd on 1/22/2017.
@@ -37,16 +44,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
     private FirebaseStorage mStorage;
     private StorageReference mStorageRef;
+    private StorageReference mImagesRef;
     private Query mQuery;
     private String mUid;
+    private HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener mListener;
 
-    public FileAdapter(Context context, RecyclerView recyclerView) {
+    public FileAdapter(Context context, RecyclerView recyclerView, HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener listener) {
         mContext = context;
         mRecyclerView = recyclerView;
         mFiles = new ArrayList<>();
+        mListener = listener;
+
+        SharedPreferences prefs = context.getSharedPreferences(NavActivity.PREFS, MODE_PRIVATE);
+        mUid = prefs.getString(NavActivity.KEY_UID, ""); //TODO: Means there is no uid
 
         // Hard coded uid for testing purposes
-        mUid = "RgTWQA1UhVXQcdhUiE8gLFSXbXA2";
+        // mUid = "RgTWQA1UhVXQcdhUiE8gLFSXbXA2";
 
         //Linking to firebase
         mFileRef = FirebaseDatabase.getInstance().getReference().child("file");
@@ -64,12 +77,28 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
         // Create a child reference
         // imagesRef now points to "images"
-        StorageReference imagesRef = mStorageRef.child("images");
+        mImagesRef = mStorageRef.child("images");
     }
 
-    public void setUid(String uid) {
-        // mUid = uid;
-        Log.d(Constants.TAG, "Adapter Uid: " + mUid);
+    public String getPath(File file) {
+//        return mImagesRef.child(file.getFilePath()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//            @Override
+//            public void onSuccess(Uri uri) {
+//                // Got the download URL for 'users/me/profile.png'
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception exception) {
+//                // Handle any errors
+//            }
+//        });//file.getFilePath());
+        mStorageRef.child("images/Yankees Image.jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+            }
+        });
+        return file.getFilePath();
     }
 
     public class FileEventListener implements ChildEventListener {
@@ -146,26 +175,26 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        File file = mFiles.get(position);
+        final File file = mFiles.get(position);
         holder.nameTextView.setText(file.getName());
         holder.descriptionTextView.setText(file.getDescription());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Something
+                mListener.OnHomeDownloadsFileInteraction(file);
             }
         });
     }
 
-    public void firebasePush(String fileName, String fileDescription) {
+    public void firebasePush(String fileName, String fileDescription, int fileType) {
         // Create a new auto-ID for a course in the courses path
         DatabaseReference ref = mFileRef.push();
         Log.d(Constants.TAG, "file ref push key: " + ref);
         Log.d(Constants.TAG, "mUid: " + mUid);
 
         // Add the course to the courses path
-        ref.setValue(new File(fileName, fileDescription, mUid));
+        ref.setValue(new File(fileName, fileDescription, mUid, fileType));
 
         // Add the course to the owners path
         Map<String, Object> map = new HashMap<>();
