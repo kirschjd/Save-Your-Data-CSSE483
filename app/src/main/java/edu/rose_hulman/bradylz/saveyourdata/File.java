@@ -20,6 +20,7 @@ public class File implements Parcelable{
     //To identify photo(0) / video(1) / text file (2)
     private int type;
     private Map<String, Boolean> owners;
+    public static final String FILE_OWNERS = "owners";
 
     public void setOwners(Map<String, Boolean> owners) {
         this.owners = owners;

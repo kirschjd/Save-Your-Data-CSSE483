@@ -121,8 +121,9 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
             context.startActivity(discoverableIntent);
 
-            TelephonyManager tManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-            MY_UUID = UUID.fromString(tManager.getDeviceId());
+            // TelephonyManager tManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+            // MY_UUID = UUID.fromString(tManager.getDeviceId());
+            MY_UUID = UUID.fromString(BluetoothDevice.EXTRA_UUID);
 
             try {
                 mSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("SYD", MY_UUID);
@@ -135,8 +136,6 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
             } catch (IOException e) {
                 Log.d(Constants.TAG, "Error near accept");
             }
-
-
         }
     }
 

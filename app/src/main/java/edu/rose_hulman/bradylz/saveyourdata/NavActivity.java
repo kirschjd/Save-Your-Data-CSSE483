@@ -33,7 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
-import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeDownloadsTabFragment;
+import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeFavoritesTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeGeneralTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeTabsFragment;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomContentTabFragment;
@@ -42,16 +42,16 @@ import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomPeopleTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomTabsFragment;
 
 public class NavActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-                                                                HomeTabsFragment.OnFragmentInteractionListener,
-                                                                HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener,
-                                                                HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
-                                                                HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener,
-                                                                RoomPeopleTabFragment.OnFragmentInteractionListener,
-                                                                RoomContentTabFragment.OnFragmentInteractionListener,
-                                                                RoomTabsFragment.OnFragmentInteractionListener,
-                                                                LoginFragment.OnLoginListener,
-                                                                GoogleApiClient.OnConnectionFailedListener,
-                                                                RoomFragment.OnRoomFileInteractionListener{
+        HomeTabsFragment.OnFragmentInteractionListener,
+        HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener,
+        HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
+        HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener,
+        RoomPeopleTabFragment.OnFragmentInteractionListener,
+        RoomContentTabFragment.OnFragmentInteractionListener,
+        RoomTabsFragment.OnFragmentInteractionListener,
+        LoginFragment.OnLoginListener,
+        GoogleApiClient.OnConnectionFailedListener,
+        RoomFragment.OnRoomFileInteractionListener {
 
     private static final int RC_GOOGLE_LOGIN = 4;
     private FirebaseAuth mAuth;
@@ -111,21 +111,21 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 //Get user and uid to pass into fragments
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                mUid = user.getUid();
 
                 Log.d(Constants.TAG, "In authlistener setup");
                 Log.d(Constants.TAG, "Current User: " + user);
 
                 if (user != null) {
                     //if(!onAuthCalled) {
-                       // onAuthCalled = true;
-                        Log.d(Constants.TAG, "In boolean if statement");
-                        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString(KEY_UID, mUid);
-                        editor.commit();
+                    // onAuthCalled = true;
+                    mUid = user.getUid();
+                    Log.d(Constants.TAG, "In boolean if statement");
+                    SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(KEY_UID, mUid);
+                    editor.commit();
 
-                        switchToHomeTabsFragment(mUid);
+                    switchToHomeTabsFragment(mUid);
                     //}
                 } else {
                     switchToLoginFragment();
@@ -273,7 +273,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         Fragment switchTo = null;
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.nav_home:
                 switchTo = new HomeTabsFragment();
                 break;
@@ -282,17 +282,17 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 break;
             case R.id.nav_settings:
                 Intent intent = new Intent(Settings.ACTION_SETTINGS);
-                if(intent.resolveActivity(getPackageManager()) != null){
+                if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
                 }
                 break;
         }
 
-        for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
+        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
             getSupportFragmentManager().popBackStackImmediate();
         }
 
-        if(switchTo != null) {
+        if (switchTo != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.addToBackStack("previous");
             ft.replace(R.id.content_nav, switchTo);
@@ -305,7 +305,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void OnHomeDownloadsFileInteraction(File file) {
+    public void onHomeFavoritesFileInteraction(File file) {
 
     }
 

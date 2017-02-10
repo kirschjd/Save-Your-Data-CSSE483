@@ -39,6 +39,7 @@ public class HomeCloudTabFragment extends Fragment {
 
     private FileAdapter mAdapter;
     RecyclerView mRecyclerView;
+    public static final String CLOUD_TAG = "Cloud";
 
     private OnHomeCloudFileInteractionSelectedListener mListener;
 
@@ -78,7 +79,7 @@ public class HomeCloudTabFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mAdapter = new FileAdapter(getContext());
+        mAdapter = new FileAdapter(getContext(), false);
     }
 
     public void add(File file) {
@@ -95,9 +96,9 @@ public class HomeCloudTabFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
 
-//        , recyclerView, new HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener() {
+//        , recyclerView, new HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener() {
 //            @Override
-//            public void OnHomeDownloadsFileInteraction(File file) {
+//            public void onHomeFavoritesFileInteraction(File file) {
 //                //TODO: copy similar method from downloads fragment
 //            }
 //        });

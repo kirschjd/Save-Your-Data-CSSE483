@@ -80,9 +80,9 @@ public class HomeGeneralTabFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.home_general_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-//        mAdapter = new FileAdapter(getContext(), recyclerView, new HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener() {
+//        mAdapter = new FileAdapter(getContext(), recyclerView, new HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener() {
 //            @Override
-//            public void OnHomeDownloadsFileInteraction(File file) {
+//            public void onHomeFavoritesFileInteraction(File file) {
 //                //TODO: copy from other method
 //            }
 //        });
