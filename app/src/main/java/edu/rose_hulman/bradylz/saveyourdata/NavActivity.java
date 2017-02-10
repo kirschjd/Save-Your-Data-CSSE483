@@ -117,8 +117,8 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 Log.d(Constants.TAG, "Current User: " + user);
 
                 if (user != null) {
-                    if(!onAuthCalled) {
-                        onAuthCalled = true;
+                    //if(!onAuthCalled) {
+                       // onAuthCalled = true;
                         Log.d(Constants.TAG, "In boolean if statement");
                         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
@@ -126,7 +126,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                         editor.commit();
 
                         switchToHomeTabsFragment(mUid);
-                    }
+                    //}
                 } else {
                     switchToLoginFragment();
                 }

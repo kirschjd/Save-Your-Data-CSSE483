@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeDownloadsTabFragment;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -47,13 +48,21 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     private StorageReference mImagesRef;
     private Query mQuery;
     private String mUid;
-    private HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener mListener;
 
-    public FileAdapter(Context context, RecyclerView recyclerView, HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener listener) {
+    private HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener mListener;
+    //private HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener mCListener;
+
+    //TODO: create adapter within the hometabsfragment and override the on tab changes to set the adapter and the listener
+    // TODO: Alterntaive is to create multiple adapters
+    public void setListener(HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener mDListener) {
+        this.mListener = mDListener;
+    }
+
+    public FileAdapter(Context context) {//, RecyclerView recyclerView) {
         mContext = context;
-        mRecyclerView = recyclerView;
+        //mRecyclerView = recyclerView;
         mFiles = new ArrayList<>();
-        mListener = listener;
+        //mListener = listener;
 
         SharedPreferences prefs = context.getSharedPreferences(NavActivity.PREFS, MODE_PRIVATE);
         mUid = prefs.getString(NavActivity.KEY_UID, ""); //TODO: Means there is no uid
@@ -69,7 +78,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
         mQuery.addChildEventListener(new FileEventListener());
 
-        mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owners").child(mUid);
+        mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owner").child(mUid);
 
         // Create a storage reference from our app
         mStorage = FirebaseStorage.getInstance();
@@ -78,6 +87,12 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         // Create a child reference
         // imagesRef now points to "images"
         mImagesRef = mStorageRef.child("images");
+    }
+
+
+
+    public void setRecyclerView (RecyclerView rview) {
+        mRecyclerView = rview;
     }
 
     public String getPath(File file) {
@@ -199,7 +214,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         // Add the course to the owners path
         Map<String, Object> map = new HashMap<>();
         map.put(ref.getKey(), true);
-        // See https://www.firebase.com/docs/android/guide/saving-data.html for this method.
         mOwnerRef.child(Owner.FILES).updateChildren(map);
     }
 

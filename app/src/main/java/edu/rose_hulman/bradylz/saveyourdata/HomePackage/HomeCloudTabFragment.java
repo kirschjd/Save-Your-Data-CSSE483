@@ -36,7 +36,9 @@ public class HomeCloudTabFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
     private FileAdapter mAdapter;
+    RecyclerView mRecyclerView;
 
     private OnHomeCloudFileInteractionSelectedListener mListener;
 
@@ -46,6 +48,9 @@ public class HomeCloudTabFragment extends Fragment {
 
     public FileAdapter getAdapter() {
         return mAdapter;
+    }
+    public void setAdapter(FileAdapter mAdapter) {
+        this.mAdapter = mAdapter;
     }
 
     /**
@@ -73,6 +78,7 @@ public class HomeCloudTabFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mAdapter = new FileAdapter(getContext());
     }
 
     public void add(File file) {
@@ -85,17 +91,19 @@ public class HomeCloudTabFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_cloud_tab, container, false);
 
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.home_cloud_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setHasFixedSize(true);
-        mAdapter = new FileAdapter(getContext(), recyclerView, new HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener() {
-            @Override
-            public void OnHomeDownloadsFileInteraction(File file) {
-                //TODO: copy similar method from downloads fragment
-            }
-        });
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.scrollToPosition(0);
+        mRecyclerView = (RecyclerView)view.findViewById(R.id.home_cloud_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
+
+//        , recyclerView, new HomeDownloadsTabFragment.OnHomeDownloadsFileSelectedInteractionListener() {
+//            @Override
+//            public void OnHomeDownloadsFileInteraction(File file) {
+//                //TODO: copy similar method from downloads fragment
+//            }
+//        });
+        mAdapter.setRecyclerView(mRecyclerView);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.scrollToPosition(0);
         return view;
     }
 

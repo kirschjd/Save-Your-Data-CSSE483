@@ -17,9 +17,13 @@ public class File implements Parcelable{
     private String description;
     private String filePath;
     private String key;
-    private Map<String, Boolean> owners;
     //To identify photo(0) / video(1) / text file (2)
     private int type;
+    private Map<String, Boolean> owners;
+
+    public void setOwners(Map<String, Boolean> owners) {
+        this.owners = owners;
+    }
 
     public int getType() {
         return type;
