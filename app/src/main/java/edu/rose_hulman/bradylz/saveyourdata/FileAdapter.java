@@ -3,6 +3,7 @@ package edu.rose_hulman.bradylz.saveyourdata;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,7 +59,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     //TODO: create adapter within the hometabsfragment and override the on tab changes to set the adapter and the listener
     // TODO: Alterntaive is to create multiple adapters
 
-    public FileAdapter(Context context, boolean inFavs) {//, RecyclerView recyclerView) {
+    public FileAdapter(Context context, boolean inFavs,
+                       HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener mfl,
+                       HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener mcl) {//, RecyclerView recyclerView) {
         mInFavs = inFavs;
         mContext = context;
         //mRecyclerView = recyclerView;
@@ -76,24 +79,25 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         // mFileRef.addChildEventListener(new FileEventListener());
 
         //Initializing the query to get our own files showing only
+        mFListener = mfl;
+        mCListener = mcl;
+
         if(inFavs) {
-            Log.d(Constants.TAG, "Setting query to favs");
             mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
-            mFListener = new HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener() {
-                @Override
-                public void onHomeFavoritesFileInteraction(File file) {
-                    switchToDetailView(file);
-                }
-            };
+//            mFListener = new HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener() {
+//                @Override
+//                public void onHomeFavoritesFileInteraction(File file) {
+//                    //switchToDetailView(file);
+//                }
+//            };
         } else {
-            Log.d(Constants.TAG, "Setting query to cloud");
             mQuery = mFileRef.orderByChild("owners/" + mUid);
-            mCListener = new HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener() {
-                @Override
-                public void onHomeCloudFileInteraction(File file) {
-                    switchToDetailView(file);
-                }
-            };
+//            mCListener = new HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener() {
+//                @Override
+//                public void onHomeCloudFileInteraction(File file) {
+//                    //switchToDetailView(file);
+//                }
+//            };
         }
         mQuery.addChildEventListener(new FileEventListener());
 
@@ -110,21 +114,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         mTextRef = mStorageRef.child("texts");
     }
 
-    private void switchToDetailView(File file) {
-
-    }
-
     public void setQuery(boolean inFavs) {
-        if(inFavs) {
-            Log.d(Constants.TAG, "Setting query to favs");
+        if (inFavs) {
             mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
         } else {
-            Log.d(Constants.TAG, "Setting query to cloud");
             mQuery = mFileRef.orderByChild("owners/" + mUid);
         }
     }
 
-    public void setRecyclerView (RecyclerView rview) {
+    public void setRecyclerView(RecyclerView rview) {
         mRecyclerView = rview;
     }
 
@@ -165,8 +163,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             String keyToFind = dataSnapshot.getKey();
             file.setKey(keyToFind);
 
-            for(int i = 0; i < mFiles.size(); i++) {
-                if(mFiles.get(i).getKey().equals(keyToFind)) {
+            for (int i = 0; i < mFiles.size(); i++) {
+                if (mFiles.get(i).getKey().equals(keyToFind)) {
                     mFiles.set(i, file);
                     notifyDataSetChanged();
                     return;
@@ -178,8 +176,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             String keyToRemove = dataSnapshot.getKey();
 
-            for(int i = 0; i < mFiles.size(); i++) {
-                if(mFiles.get(i).getKey().equals(keyToRemove)) {
+            for (int i = 0; i < mFiles.size(); i++) {
+                if (mFiles.get(i).getKey().equals(keyToRemove)) {
                     mFiles.remove(i);
                     notifyDataSetChanged();
                     return;
@@ -230,18 +228,18 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mInFavs) {
+                if (mInFavs) {
                     mFListener.onHomeFavoritesFileInteraction(file);
-                    Log.d(Constants.TAG, "X In Favs Listener");
+                    Log.d(Constants.TAG, "mFListener: " + mFListener);
                 } else {
                     mCListener.onHomeCloudFileInteraction(file);
-                    Log.d(Constants.TAG, "X In Cloud Listener");
+                    Log.d(Constants.TAG, "mCListener: " + mCListener);
                 }
             }
         });
     }
 
-    public void firebasePush(String fileName, String fileDescription, int fileType) {
+    public void firebasePushVideo(String fileName, String fileDescription, int fileType, Uri video) {
         // Create a new auto-ID for a course in the courses path
         DatabaseReference ref = mFileRef.push();
         Log.d(Constants.TAG, "file ref push key: " + ref);
@@ -250,6 +248,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         // Add the file to the files path
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
+
+        StorageReference videoRef = mVideosRef.child(fileName);
+        videoRef.putFile(video);
+
+        ref.child("path").setValue(videoRef.getPath());
 
         // Add the file to the owners path
         Map<String, Object> map = new HashMap<>();
@@ -272,6 +275,28 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
         // mTextRef.child(fileName).putBytes(textInput.getBytes());
         ref.child("path").setValue(textRef.getPath());
+
+        // Add the file to the owners path
+        Map<String, Object> map = new HashMap<>();
+        map.put(ref.getKey(), true);
+        mOwnerRef.child(Owner.FILES).updateChildren(map);
+    }
+
+    public void firebasePushPhoto (String fileName, String fileDescription, int fileType, Uri image) {
+        // Create a new auto-ID for a course in the courses path
+        DatabaseReference ref = mFileRef.push();
+        Log.d(Constants.TAG, "file ref push key: " + ref);
+        Log.d(Constants.TAG, "mUid: " + mUid);
+
+        // Add the file to the files path
+        ref.setValue(new File(fileName, fileDescription, mUid, fileType));
+        ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
+
+        StorageReference imageRef = mImagesRef.child(fileName);
+        imageRef.putFile(image);
+
+        // mTextRef.child(fileName).putBytes(textInput.getBytes());
+        ref.child("path").setValue(imageRef.getPath());
 
         // Add the file to the owners path
         Map<String, Object> map = new HashMap<>();

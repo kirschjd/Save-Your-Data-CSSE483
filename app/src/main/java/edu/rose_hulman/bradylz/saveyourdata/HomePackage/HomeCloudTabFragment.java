@@ -40,7 +40,6 @@ public class HomeCloudTabFragment extends Fragment {
     private FileAdapter mAdapter;
     RecyclerView mRecyclerView;
     public static final String CLOUD_TAG = "Cloud";
-
     private OnHomeCloudFileInteractionSelectedListener mListener;
 
     public HomeCloudTabFragment() {
@@ -79,7 +78,7 @@ public class HomeCloudTabFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mAdapter = new FileAdapter(getContext(), false);
+        mAdapter = new FileAdapter(getContext(), false, null, mListener);
     }
 
     public void add(File file) {

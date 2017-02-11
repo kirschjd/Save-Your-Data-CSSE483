@@ -1,5 +1,6 @@
 package edu.rose_hulman.bradylz.saveyourdata;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -46,12 +47,11 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener,
         HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
         HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener,
-        RoomPeopleTabFragment.OnFragmentInteractionListener,
-        RoomContentTabFragment.OnFragmentInteractionListener,
         RoomTabsFragment.OnFragmentInteractionListener,
         LoginFragment.OnLoginListener,
         GoogleApiClient.OnConnectionFailedListener,
-        RoomFragment.OnRoomFileInteractionListener {
+        RoomFragment.OnRoomFileInteractionListener,
+        DetailFragment.OnFileDetailSelectedInteractionListener {
 
     private static final int RC_GOOGLE_LOGIN = 4;
     private FirebaseAuth mAuth;
@@ -305,11 +305,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void onHomeFavoritesFileInteraction(File file) {
-
-    }
-
-    @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         showLoginError(connectionResult.getErrorMessage());
     }
@@ -321,16 +316,33 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
     @Override
     public void onHomeCloudFileInteraction(File file) {
+        switchToDetailView(file);
+    }
 
+    @Override
+    public void onHomeFavoritesFileInteraction(File file) {
+        switchToDetailView(file);
+    }
+
+    private void switchToDetailView(File file) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        DetailFragment fragment = DetailFragment.newInstance(file);
+        ft.replace(R.id.content_nav, fragment);
+        ft.addToBackStack("detail");
+        ft.commit();
     }
 
     @Override
     public void onHomeGeneralFileInteraction(File file) {
-
     }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onFileDetailInteraction(File file) {
 
     }
 }
