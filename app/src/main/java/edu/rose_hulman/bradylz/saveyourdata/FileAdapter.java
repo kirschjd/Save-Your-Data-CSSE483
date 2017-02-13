@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -44,109 +46,67 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     private DatabaseReference mFileRef;
     private DatabaseReference mOwnerRef;
 
+    //References to Firebase storage
     private FirebaseStorage mStorage;
     private StorageReference mStorageRef;
     private StorageReference mImagesRef;
     private StorageReference mVideosRef;
     private StorageReference mTextRef;
+
+    //Query to sort viewable files in Firebase
     private Query mQuery;
+
+    //Uid
     private String mUid;
+
+    //Boolean to keep track of what tab we're in (i.e. Favorites or Cloud)
     private boolean mInFavs;
 
+    //Listeners for on files selected
     private HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener mFListener;
     private HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener mCListener;
 
-    //TODO: create adapter within the hometabsfragment and override the on tab changes to set the adapter and the listener
-    // TODO: Alterntaive is to create multiple adapters
-
     public FileAdapter(Context context, boolean inFavs,
                        HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener mfl,
-                       HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener mcl) {//, RecyclerView recyclerView) {
+                       HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener mcl) {
         mInFavs = inFavs;
         mContext = context;
-        //mRecyclerView = recyclerView;
         mFiles = new ArrayList<>();
-        //mListener = listener;
 
         SharedPreferences prefs = context.getSharedPreferences(NavActivity.PREFS, MODE_PRIVATE);
-        mUid = prefs.getString(NavActivity.KEY_UID, ""); //TODO: Means there is no uid
-
-        // Hard coded uid for testing purposes
-        // mUid = "RgTWQA1UhVXQcdhUiE8gLFSXbXA2";
+        mUid = prefs.getString(NavActivity.KEY_UID, ""); //Blank default means there is no uid
 
         //Linking to firebase
         mFileRef = FirebaseDatabase.getInstance().getReference().child("file");
-        // mFileRef.addChildEventListener(new FileEventListener());
+        mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owner").child(mUid);
 
         //Initializing the query to get our own files showing only
         mFListener = mfl;
         mCListener = mcl;
 
-        if(inFavs) {
-            mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
-//            mFListener = new HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener() {
-//                @Override
-//                public void onHomeFavoritesFileInteraction(File file) {
-//                    //switchToDetailView(file);
-//                }
-//            };
+        //Changing the query based off what tab we're in, add listener either way
+        if (inFavs) {
+            mQuery = mFileRef.orderByChild("favoritedBy/" + mUid).equalTo(true);
         } else {
-            mQuery = mFileRef.orderByChild("owners/" + mUid);
-//            mCListener = new HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener() {
-//                @Override
-//                public void onHomeCloudFileInteraction(File file) {
-//                    //switchToDetailView(file);
-//                }
-//            };
+            mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
         }
         mQuery.addChildEventListener(new FileEventListener());
-
-        mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owner").child(mUid);
 
         // Create a storage reference from our app
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReferenceFromUrl("gs://save-your-data-csse483.appspot.com");
 
-        // Create a child reference
-        // imagesRef now points to "images"
+        // Create a child reference to folders within storage
         mImagesRef = mStorageRef.child("images");
         mVideosRef = mStorageRef.child("videos");
         mTextRef = mStorageRef.child("texts");
-    }
-
-    public void setQuery(boolean inFavs) {
-        if (inFavs) {
-            mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
-        } else {
-            mQuery = mFileRef.orderByChild("owners/" + mUid);
-        }
     }
 
     public void setRecyclerView(RecyclerView rview) {
         mRecyclerView = rview;
     }
 
-    public String getPath(File file) {
-//        return mImagesRef.child(file.getFilePath()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//            @Override
-//            public void onSuccess(Uri uri) {
-//                // Got the download URL for 'users/me/profile.png'
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception exception) {
-//                // Handle any errors
-//            }
-//        });//file.getFilePath());
-        mStorageRef.child("images/Yankees Image.jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-
-            }
-        });
-        return file.getFilePath();
-    }
-
+    //Child event listener for the firebase reference query
     public class FileEventListener implements ChildEventListener {
 
         @Override
@@ -197,20 +157,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     }
 
     public void add(File file) {
-        Log.d(Constants.TAG, "File being inserted : " + file.toString());
         mFileRef.push().setValue(file);
         mFileRef.keepSynced(true);
-    }
-
-    public void remove(File file) {
-        mFileRef.child(file.getKey()).removeValue();
-    }
-
-    public void update(File file, String newCaption, String newURL) {
-//        pic.setCaption(newCaption);
-//        pic.setUrl(newURL);
-//        mPicsRefs.child(pic.getKey()).setValue(pic);
-//        mPicsRefs.child(pic.getKey()).keepSynced(true);
     }
 
     @Override
@@ -230,25 +178,63 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             public void onClick(View v) {
                 if (mInFavs) {
                     mFListener.onHomeFavoritesFileInteraction(file);
-                    Log.d(Constants.TAG, "mFListener: " + mFListener);
                 } else {
                     mCListener.onHomeCloudFileInteraction(file);
-                    Log.d(Constants.TAG, "mCListener: " + mCListener);
                 }
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //Checking to see if the file is favorited by adding a single value event listener
+                final boolean[] isFaved = new boolean[1];
+
+                Query favorited = mFileRef.child(file.getKey()).orderByChild("favoritedBy/" + mUid).equalTo(true);
+                favorited.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(Constants.TAG, "data snapshot" + dataSnapshot.getKey());
+                        if(dataSnapshot.getValue() == null) {
+                            Log.d(Constants.TAG, "NULL Boolean is " + isFaved[0]);
+                            isFaved[0] = false;
+                        } else {
+                            Log.d(Constants.TAG, "Boolean is " + isFaved[0]);
+                            isFaved[0] = true;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                if (mInFavs) {
+                    mFListener.onLongFavoritesFileInteraction(file, isFaved[0]);
+                } else {
+                    mCListener.onLongCloudFileInteraction(file, isFaved[0]);
+                }
+                mFileRef.keepSynced(true);
+                mOwnerRef.keepSynced(true);
+                return true;
             }
         });
     }
 
+    //Pushes a video file to Firebase
     public void firebasePushVideo(String fileName, String fileDescription, int fileType, Uri video) {
         // Create a new auto-ID for a course in the courses path
         DatabaseReference ref = mFileRef.push();
-        Log.d(Constants.TAG, "file ref push key: " + ref);
-        Log.d(Constants.TAG, "mUid: " + mUid);
 
         // Add the file to the files path
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
+        // Add the current user to the owners attribute
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
+        // Add the current user to the favoritedBy attribute, but set to false
+        // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
+        //Add the file to storage
         StorageReference videoRef = mVideosRef.child(fileName);
         videoRef.putFile(video);
 
@@ -260,20 +246,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         mOwnerRef.child(Owner.FILES).updateChildren(map);
     }
 
+    //Pushes a text file to Firebase
     public void firebasePushText(String fileName, String fileDescription, int fileType, String textInput) {
         // Create a new auto-ID for a course in the courses path
         DatabaseReference ref = mFileRef.push();
-        Log.d(Constants.TAG, "file ref push key: " + ref);
-        Log.d(Constants.TAG, "mUid: " + mUid);
 
         // Add the file to the files path
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
+        // Add the current user to the owners attribute
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
+        // Add the current user to the favoritedBy attribute, but set to false
+        // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
+        //Add the file to storage
         StorageReference textRef = mTextRef.child(fileName);
         textRef.putBytes(textInput.getBytes());
 
-        // mTextRef.child(fileName).putBytes(textInput.getBytes());
         ref.child("path").setValue(textRef.getPath());
 
         // Add the file to the owners path
@@ -282,20 +270,22 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         mOwnerRef.child(Owner.FILES).updateChildren(map);
     }
 
-    public void firebasePushPhoto (String fileName, String fileDescription, int fileType, Uri image) {
+    //Pushes an image file to Firebase
+    public void firebasePushPhoto(String fileName, String fileDescription, int fileType, Uri image) {
         // Create a new auto-ID for a course in the courses path
         DatabaseReference ref = mFileRef.push();
-        Log.d(Constants.TAG, "file ref push key: " + ref);
-        Log.d(Constants.TAG, "mUid: " + mUid);
 
         // Add the file to the files path
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
+        // Add the current user to the owners attribute
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
+        // Add the current user to the favoritedBy attribute, but set to false
+        // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
+        //Add the file to storage
         StorageReference imageRef = mImagesRef.child(fileName);
         imageRef.putFile(image);
 
-        // mTextRef.child(fileName).putBytes(textInput.getBytes());
         ref.child("path").setValue(imageRef.getPath());
 
         // Add the file to the owners path

@@ -57,4 +57,7 @@
     <string name="room">Room</string>
     <string name="download_prompt_title">Do you want to download this file?</string>
     <string name="input_text_title">Input Text Below:</string>
+    <string name="edit_file_description">Toggle the switch to favorite this file</string>
+    <string name="edit_favorite_toggle">Favorite</string>
+    <string name="delete_file_string">Delete File</string>
 </resources>

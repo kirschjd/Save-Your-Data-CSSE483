@@ -21,6 +21,7 @@ public class File implements Parcelable{
     private int type;
     private Map<String, Boolean> owners;
     public static final String FILE_OWNERS = "owners";
+    public static final String FILE_FAVORITEDBY = "favoritedBy";
 
     public void setOwners(Map<String, Boolean> owners) {
         this.owners = owners;

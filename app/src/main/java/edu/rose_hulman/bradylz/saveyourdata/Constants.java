@@ -6,5 +6,6 @@ package edu.rose_hulman.bradylz.saveyourdata;
 
 public class Constants {
     public static final String TAG = "syd";
+    public static final String BT_TAG = "btsyd";
     public static final String FIREBASE_PATH = "FIREBASE_PATH";
 }

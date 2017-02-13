@@ -144,5 +144,6 @@ public class HomeCloudTabFragment extends Fragment {
     public interface OnHomeCloudFileInteractionSelectedListener {
         // TODO: Update argument type and name
         void onHomeCloudFileInteraction(File file);
+        void onLongCloudFileInteraction(File file, boolean fav);
     }
 }

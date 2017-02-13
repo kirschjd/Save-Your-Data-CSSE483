@@ -159,6 +159,7 @@ public class HomeFavoritesTabFragment extends Fragment {
     public interface OnHomeFavoritesFileSelectedInteractionListener {
         // TODO: Update argument type and name
         void onHomeFavoritesFileInteraction(File file);
+        void onLongFavoritesFileInteraction(File file, boolean fav);
     }
 
     public void setContext(Context context) {

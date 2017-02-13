@@ -22,7 +22,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TabHost;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import edu.rose_hulman.bradylz.saveyourdata.Constants;
 import edu.rose_hulman.bradylz.saveyourdata.File;
@@ -58,6 +62,7 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
     private Context mContext;
     private FileAdapter mAdapter;
     private String mUid;
+
     //To identify photo(0) / video(1) / text file (2)
     private int optionsIndex;
     private boolean onCreateViewCalled = false;
@@ -65,7 +70,6 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
     //The tabs of the tab host
     HomeFavoritesTabFragment mFavorites;
     HomeCloudTabFragment mCloud;
-    HomeGeneralTabFragment mGeneral;
 
     public HomeTabsFragment() {
         // Required empty public constructor
@@ -123,24 +127,6 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
         mTabHost = (FragmentTabHost) view.findViewById(android.R.id.tabhost);
         mTabHost.setup(getActivity(), getChildFragmentManager(), R.id.realtabcontent);
 
-//        mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-//            @Override
-//            public void onTabChanged(String tabId) {
-//                Log.d(Constants.TAG, "In tab changed listener");
-//                switch (tabId) {
-//                    case HomeFavoritesTabFragment.FAV_TAG:
-//                        Log.d(Constants.TAG, "Favorites adapter: " + mFavorites.getAdapter());
-//                        break;
-//                    case HomeCloudTabFragment.CLOUD_TAG:
-//                        Log.d(Constants.TAG, "Cloud adapter: " + mCloud.getAdapter());
-//                        break;
-//                    default:
-//                        Log.d(Constants.TAG, "Couldn't get tag");
-//                        break;
-//                }
-//            }
-//        });
-
         //Adding in the downloads tab
         mFavorites = new HomeFavoritesTabFragment();
         mFavorites.setAdapter(mAdapter);
@@ -151,10 +137,6 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
         mCloud.setAdapter(mAdapter);
         mTabHost.addTab(mTabHost.newTabSpec(HomeCloudTabFragment.CLOUD_TAG).setIndicator(getString(R.string.home_cloud_tab)), mCloud.getClass(), null);
 
-        //Adding in the cloud tab
-        // mTabHost.addTab(mTabHost.newTabSpec("general").setIndicator(getString(R.string.home_general_tab)), HomeGeneralTabFragment.class, null);
-
-        Log.d(Constants.TAG, "In home tabs fragment");
         return view;
     }
 
@@ -164,10 +146,11 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
 
     private void showOptions() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
         builder.setTitle("Choose a file type:");
         optionsIndex = 0;
 
-        View view = getActivity().getLayoutInflater().inflate(R.layout.add_file_options, null, false);
+        final View view = getActivity().getLayoutInflater().inflate(R.layout.add_file_options, null, false);
         builder.setView(view);
 
         //Photo
@@ -219,9 +202,10 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
             public void onClick(DialogInterface dialog, int which) {
                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                java.io.File photo = new java.io.File(photoPath);
-
-                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
+                String currentTimeStamp = dateFormat.format(new Date());
+                java.io.File f = new java.io.File(android.os.Environment.getExternalStorageDirectory(), currentTimeStamp);
+                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
                 startActivityForResult(takePicture, 0);
             }
         });
@@ -231,7 +215,7 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
             public void onClick(DialogInterface dialog, int which) {
                 Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto , 1);
+                startActivityForResult(pickPhoto, 1);
             }
         });
 
@@ -255,42 +239,39 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
             public void onClick(DialogInterface dialog, int which) {
                 Intent pickVideo = new Intent(Intent.ACTION_PICK,
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickVideo , 4);
+                startActivityForResult(pickVideo, 4);
             }
         });
 
         builder.create().show();
     }
 
-    //showAddEditDialog(null, optionsIndex, getActivity());
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent fileReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, fileReturnedIntent);
 
-        switch(requestCode) {
+        switch (requestCode) {
             case 0:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     Uri selectedImage = fileReturnedIntent.getData();
                     Log.d(Constants.TAG, "Uri: " + selectedImage);
                     addPhotoDialog(null, optionsIndex, getActivity(), selectedImage);
                 }
                 break;
             case 1:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     Uri selectedImage = fileReturnedIntent.getData();
-                    // imageview.setImageURI(selectedImage);
                     addPhotoDialog(null, optionsIndex, getActivity(), selectedImage);
                 }
                 break;
             case 3:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     Uri selectedVideo = fileReturnedIntent.getData();
                     addVideoDialog(null, optionsIndex, getActivity(), selectedVideo);
                 }
                 break;
             case 4:
-                if(resultCode == RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     Uri selectedVideo = fileReturnedIntent.getData();
                     addVideoDialog(null, optionsIndex, getActivity(), selectedVideo);
                 }
@@ -328,42 +309,13 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
         builder.create().show();
     }
 
-    public void addPhotoDialog (final File file, final int optionsIndex, Context context, final Uri image) {
+    public void addPhotoDialog(final File file, final int optionsIndex, Context context, final Uri image) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(file == null ? R.string.dialog_add_title : R.string.dialog_update_title));
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_add, null, false);
         builder.setView(view);
         final EditText titleEditText = (EditText) view.findViewById(R.id.dialog_add_title);
         final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
-
-        if (file != null) {
-            // pre-populate
-            titleEditText.setText(file.getName());
-            descriptionEditText.setText(file.getDescription());
-
-            TextWatcher textWatcher = new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    // empty
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    // empty
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    String name = titleEditText.getText().toString();
-                    String description = descriptionEditText.getText().toString();
-                    //TODO: Commit the file to firebase after this step
-                    mAdapter.update(file, name, description);
-                }
-            };
-
-            titleEditText.addTextChangedListener(textWatcher);
-            descriptionEditText.addTextChangedListener(textWatcher);
-        }
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -372,14 +324,7 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
                     //Creating the new file to add
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
-                    //File newFile = new File(name, description, uid, optionsIndex);
-
-                    if (file == null) {
-                        //mAdapter.add(newFile);
-                        mAdapter.firebasePushPhoto(name, description, optionsIndex, image);
-                    } else {
-
-                    }
+                    mAdapter.firebasePushPhoto(name, description, optionsIndex, image);
                 }
             }
         });
@@ -389,42 +334,13 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
         builder.create().show();
     }
 
-    public void addVideoDialog (final File file, final int optionsIndex, Context context, final Uri video) {
+    public void addVideoDialog(final File file, final int optionsIndex, Context context, final Uri video) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(getString(file == null ? R.string.dialog_add_title : R.string.dialog_update_title));
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_add, null, false);
         builder.setView(view);
         final EditText titleEditText = (EditText) view.findViewById(R.id.dialog_add_title);
         final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
-
-        if (file != null) {
-            // pre-populate
-            titleEditText.setText(file.getName());
-            descriptionEditText.setText(file.getDescription());
-
-            TextWatcher textWatcher = new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    // empty
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    // empty
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    String name = titleEditText.getText().toString();
-                    String description = descriptionEditText.getText().toString();
-                    //TODO: Commit the file to firebase after this step
-                    mAdapter.update(file, name, description);
-                }
-            };
-
-            titleEditText.addTextChangedListener(textWatcher);
-            descriptionEditText.addTextChangedListener(textWatcher);
-        }
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -433,75 +349,7 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
                     //Creating the new file to add
                     String name = titleEditText.getText().toString();
                     String description = descriptionEditText.getText().toString();
-                    //File newFile = new File(name, description, uid, optionsIndex);
-
-                    if (file == null) {
-                        //mAdapter.add(newFile);
-                        mAdapter.firebasePushVideo(name, description, optionsIndex, video);
-                    } else {
-
-                    }
-                }
-            }
-        });
-
-        builder.setNegativeButton(android.R.string.cancel, null);
-
-        builder.create().show();
-    }
-
-    public void showAddEditDialog(final File file, final int optionsIndex, Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(getString(file == null ? R.string.dialog_add_title : R.string.dialog_update_title));
-        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_add, null, false);
-        builder.setView(view);
-        final EditText titleEditText = (EditText) view.findViewById(R.id.dialog_add_title);
-        final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
-
-        if (file != null) {
-            // pre-populate
-            titleEditText.setText(file.getName());
-            descriptionEditText.setText(file.getDescription());
-
-            TextWatcher textWatcher = new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    // empty
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    // empty
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    String name = titleEditText.getText().toString();
-                    String description = descriptionEditText.getText().toString();
-                    //TODO: Commit the file to firebase after this step
-                    mAdapter.update(file, name, description);
-                }
-            };
-
-            titleEditText.addTextChangedListener(textWatcher);
-            descriptionEditText.addTextChangedListener(textWatcher);
-        }
-
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (file == null) {
-                    //Creating the new file to add
-                    String name = titleEditText.getText().toString();
-                    String description = descriptionEditText.getText().toString();
-                    //File newFile = new File(name, description, uid, optionsIndex);
-
-                    if (file == null) {
-                        //mAdapter.add(newFile);
-                        // mAdapter.firebasePush(name, description, optionsIndex);
-                    } else {
-
-                    }
+                    mAdapter.firebasePushVideo(name, description, optionsIndex, video);
                 }
             }
         });
@@ -513,18 +361,10 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         setRetainInstance(true);
 
         mTabHost.setOnTabChangedListener(this);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -550,16 +390,18 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
     }
 
     @Override
+    public void onLongCloudFileInteraction(File file, boolean fav) {
+
+    }
+
+    @Override
     public void onHomeFavoritesFileInteraction(File file) {
         Log.d(Constants.TAG, "DOUBLE YESSS!!!");
     }
 
-    private void switchToDetailView(File file) {
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//        DocDetailFragment fragment = DocDetailFragment.newInstance(doc);
-//        ft.replace(R.id.fragment_container, fragment);
-//        ft.addToBackStack("detail");
-//        ft.commit();
+    @Override
+    public void onLongFavoritesFileInteraction(File file, boolean fav) {
+
     }
 
     @Override
@@ -571,14 +413,10 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
     public void onTabChanged(String tabId) {
         switch (tabId) {
             case HomeFavoritesTabFragment.FAV_TAG:
-                Log.d(Constants.TAG, "Favorites adapter: " + mFavorites.getAdapter());
                 switchFragment(mFavorites);
-                //mFavorites.getAdapter().setQuery(true);
                 break;
             case HomeCloudTabFragment.CLOUD_TAG:
-                Log.d(Constants.TAG, "Cloud adapter: " + mCloud.getAdapter());
                 switchFragment(mCloud);
-                //mCloud.getAdapter().setQuery(false);
                 break;
             default:
                 Log.d(Constants.TAG, "Couldn't get tag");
@@ -588,7 +426,6 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
     }
 
     private void switchFragment(Fragment fragment) {
-        Log.d(Constants.TAG, "Switch fragments");
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(android.R.id.tabcontent, fragment)
@@ -610,81 +447,4 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-//    private void showAddEditDialog(final File file) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-//        builder.setTitle(getString(file == null ? R.string.dialog_add_title : R.string.dialog_update_title));
-//        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_add, null, false);
-//        builder.setView(view);
-//        final EditText titleEditText = (EditText) view.findViewById(R.id.dialog_add_title);
-//        final EditText descriptionEditText = (EditText) view.findViewById(R.id.dialog_add_description);
-//        if (file != null) {
-//            // pre-populate
-//            titleEditText.setText(file.getName());
-//            descriptionEditText.setText(file.getDescription());
-//
-//            TextWatcher textWatcher = new TextWatcher() {
-//                @Override
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                    // empty
-//                }
-//
-//                @Override
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                    // empty
-//                }
-//
-//                @Override
-//                public void afterTextChanged(Editable s) {
-//                    String name = titleEditText.getText().toString();
-//                    String description = descriptionEditText.getText().toString();
-//                    //TODO: Commit the file to firebase after this step
-//                    mAdapter.update(file, name, description);
-//                }
-//            };
-//
-//            titleEditText.addTextChangedListener(textWatcher);
-//            descriptionEditText.addTextChangedListener(textWatcher);
-//        }
-//
-//        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                if (file == null) {
-//                    //Creating the new file to add
-//                    String name = titleEditText.getText().toString();
-//                    String description = descriptionEditText.getText().toString();
-//
-//                    File newFile = new File(name, description, mUid, optionsIndex);
-//
-//                    // Checking which fragment we're in to add the file
-//                    String tag = mTabHost.getCurrentTabTag();
-//                    switch (tag){
-//                        case "downloads":
-//                            Log.d(Constants.TAG, "Downloads Fragment when adding: " + mFavorites.getId());
-//                            mFavorites.add(newFile);
-//                            //HomeFavoritesTabFragment downloads = (HomeFavoritesTabFragment)
-//                            //        getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-//                            break;
-//                        case "cloud":
-//                            HomeCloudTabFragment hctf = (HomeCloudTabFragment)
-//                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-//                            hctf.add(newFile);
-//                            break;
-//                        case "general":
-//                            HomeGeneralTabFragment hgtf = (HomeGeneralTabFragment)
-//                                    getChildFragmentManager().findFragmentById(mTabHost.getCurrentTab());
-//                            hgtf.add(newFile);
-//                            break;
-//                        default:
-//                            Log.d(Constants.TAG, "Couldn't get tag");
-//                            break;
-//                    }
-//                }
-//            }
-//        });
-//        builder.setNegativeButton(android.R.string.cancel, null);
-//
-//        builder.create().show();
-//    }
 }

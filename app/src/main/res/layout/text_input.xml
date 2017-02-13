@@ -6,13 +6,13 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Name"
+        android:hint="Name"
         android:id="@+id/text_file_title" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Description"
+        android:hint="Description"
         android:id="@+id/text_file_description" />
 
     <EditText

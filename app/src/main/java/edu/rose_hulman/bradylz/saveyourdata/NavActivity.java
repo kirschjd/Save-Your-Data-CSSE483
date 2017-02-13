@@ -1,6 +1,7 @@
 package edu.rose_hulman.bradylz.saveyourdata;
 
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -13,11 +14,18 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,6 +40,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.w3c.dom.Text;
 
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeFavoritesTabFragment;
@@ -63,7 +75,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     private String mUid;
     public static String PREFS = "PREFS";
     public static String KEY_UID = "KEY_UID";
-    private boolean onAuthCalled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +82,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         setContentView(R.layout.activity_nav);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Log.d(Constants.TAG, "In Nav Activity onCreate");
 
         mAuth = FirebaseAuth.getInstance();
         initializeListeners();
@@ -112,21 +121,14 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 //Get user and uid to pass into fragments
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                Log.d(Constants.TAG, "In authlistener setup");
-                Log.d(Constants.TAG, "Current User: " + user);
-
                 if (user != null) {
-                    //if(!onAuthCalled) {
-                    // onAuthCalled = true;
                     mUid = user.getUid();
-                    Log.d(Constants.TAG, "In boolean if statement");
                     SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString(KEY_UID, mUid);
                     editor.commit();
 
                     switchToHomeTabsFragment(mUid);
-                    //}
                 } else {
                     switchToLoginFragment();
                 }
@@ -178,7 +180,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(Constants.TAG, "In on start");
         mAuth.addAuthStateListener(mAuthListener);
     }
 
@@ -320,9 +321,21 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
+    public void onLongCloudFileInteraction(File file, boolean fav) {
+        editFileDialog(file, fav);
+    }
+
+    @Override
     public void onHomeFavoritesFileInteraction(File file) {
         switchToDetailView(file);
     }
+
+    @Override
+    public void onLongFavoritesFileInteraction(File file, boolean fav) {
+        editFileDialog(file, fav);
+    }
+
+    // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
     private void switchToDetailView(File file) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -330,6 +343,44 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         ft.replace(R.id.content_nav, fragment);
         ft.addToBackStack("detail");
         ft.commit();
+    }
+
+    private void editFileDialog(final File file, boolean favorited) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit " + file.getName());
+        View view = getLayoutInflater().inflate(R.layout.edit_file_dialog, null, false);
+        builder.setView(view);
+
+        final Switch fav = (Switch) view.findViewById(R.id.edit_file_fav_switch);
+        fav.setChecked(favorited);
+
+        final DatabaseReference fileRef = FirebaseDatabase.getInstance().getReference().child("file");
+        final DatabaseReference ownerRef = FirebaseDatabase.getInstance().getReference().child("owner").child(mUid);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(fav.isChecked()) {
+                    fileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).setValue(true);
+                } else {
+                    fileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).removeValue();
+                }
+                fileRef.keepSynced(true);
+            }
+        });
+
+        builder.setNegativeButton(android.R.string.cancel, null);
+
+        builder.setNeutralButton(R.string.delete_file_string, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                fileRef.child(file.getKey()).child("owners/" + mUid).removeValue();
+                ownerRef.child("files/" + file.getKey()).removeValue();
+                ownerRef.keepSynced(true);
+            }
+        });
+
+        builder.create().show();
     }
 
     @Override

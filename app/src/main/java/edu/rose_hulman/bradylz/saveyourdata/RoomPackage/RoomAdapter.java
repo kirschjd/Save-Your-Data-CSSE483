@@ -58,7 +58,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
     private BluetoothAdapter mBluetoothAdapter;
     private static int REQUEST_ENABLE_BT = 1;
     private BluetoothServerSocket mSocket;
-    private UUID MY_UUID;
+    private UUID MY_UUID = UUID.fromString("93e6dde0-f174-11e6-9598-0800200c9a66");
+    BluetoothDevice mDevice;
 
     public RoomAdapter(Context context, RoomFragment.OnRoomFileInteractionListener listener) {
         mFiles = new ArrayList<>();
@@ -72,7 +73,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         //TODO: Change to deal with the uids retrieved from bluetooth
         mFileRef = FirebaseDatabase.getInstance().getReference().child("file");
         mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owner/" + mUid);
-        mQuery = mFileRef.orderByChild("owners/owner1").equalTo(true);
+        mQuery = mFileRef.orderByChild("owners/" + mUid).equalTo(true);
         mQuery.addChildEventListener(new RoomFileEventListener());
 
         //Initializing bluetooth and checking if its supported
@@ -84,11 +85,13 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
             status = "Bluetooth is not enabled";
             Toast.makeText(context, status, Toast.LENGTH_SHORT).show();
         } else {
+            Log.d(Constants.BT_TAG, "Top of bluetooth");
             //Toast indicating bluetooth is working
             String address = mBluetoothAdapter.getAddress();
             String name = mBluetoothAdapter.getName();
             status = name + " : " + address + " bluetooth enabled";
             Toast.makeText(context, status, Toast.LENGTH_SHORT).show();
+            Log.d(Constants.BT_TAG, "After toast");
 
             //Checking to see if it's enabled
             if (!mBluetoothAdapter.isEnabled()) {
@@ -107,7 +110,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
                 }
             }
 
-            if(mBluetoothAdapter.isDiscovering()) {
+            if (mBluetoothAdapter.isDiscovering()) {
                 mBluetoothAdapter.cancelDiscovery();
             }
             mBluetoothAdapter.startDiscovery();
@@ -123,19 +126,31 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
 
             // TelephonyManager tManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
             // MY_UUID = UUID.fromString(tManager.getDeviceId());
-            MY_UUID = UUID.fromString(BluetoothDevice.EXTRA_UUID);
 
-            try {
-                mSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("SYD", MY_UUID);
-            } catch (IOException e) {
-                Log.d(Constants.TAG, "IOException from uuid");
+            Log.d(Constants.BT_TAG, "UUID: " + MY_UUID);
+
+            for (BluetoothDevice device : pairedDevices) {
+                ConnectThread connectThread = new ConnectThread(device);
+                connectThread.run();
+                Log.d(Constants.BT_TAG, "Accepted and running connected thread");
             }
 
-            try {
-                mSocket.accept();
-            } catch (IOException e) {
-                Log.d(Constants.TAG, "Error near accept");
-            }
+            AcceptThread acceptThread = new AcceptThread();
+            acceptThread.run();
+
+            Log.d(Constants.BT_TAG, "Accepted and running thread");
+
+//            try {
+//                mSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord("SYD", MY_UUID);
+//            } catch (IOException e) {
+//                Log.d(Constants.BT_TAG, "IOException from uuid");
+//            }
+//
+//            try {
+//                mSocket.accept();
+//            } catch (IOException e) {
+//                Log.d(Constants.BT_TAG, "Error near accept");
+//            }
         }
     }
 
@@ -190,6 +205,59 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         }
     }
 
+    private class ConnectThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final BluetoothDevice mmDevice;
+
+        public ConnectThread(BluetoothDevice device) {
+            // Use a temporary object that is later assigned to mmSocket
+            // because mmSocket is final.
+            BluetoothSocket tmp = null;
+            mmDevice = device;
+
+            try {
+                // Get a BluetoothSocket to connect with the given BluetoothDevice.
+                // MY_UUID is the app's UUID string, also used in the server code.
+                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+            } catch (IOException e) {
+                Log.d(Constants.BT_TAG, "Socket's create() method failed", e);
+            }
+            mmSocket = tmp;
+        }
+
+        public void run() {
+            // Cancel discovery because it otherwise slows down the connection.
+            mBluetoothAdapter.cancelDiscovery();
+
+            try {
+                // Connect to the remote device through the socket. This call blocks
+                // until it succeeds or throws an exception.
+                mmSocket.connect();
+            } catch (IOException connectException) {
+                // Unable to connect; close the socket and return.
+                try {
+                    mmSocket.close();
+                } catch (IOException closeException) {
+                    Log.d(Constants.BT_TAG, "Could not close the client socket", closeException);
+                }
+                return;
+            }
+
+            // The connection attempt succeeded. Perform work associated with
+            // the connection in a separate thread.
+            // manageMyConnectedSocket(mmSocket);
+        }
+
+        // Closes the client socket and causes the thread to finish.
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+                Log.d(Constants.BT_TAG, "Could not close the client socket", e);
+            }
+        }
+    }
+
     // Create a BroadcastReceiver for ACTION_FOUND.
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -220,8 +288,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
             String keyToFind = dataSnapshot.getKey();
             file.setKey(keyToFind);
 
-            for(int i = 0; i < mFiles.size(); i++) {
-                if(mFiles.get(i).getKey().equals(keyToFind)) {
+            for (int i = 0; i < mFiles.size(); i++) {
+                if (mFiles.get(i).getKey().equals(keyToFind)) {
                     mFiles.set(i, file);
                     notifyDataSetChanged();
                     return;
@@ -233,8 +301,8 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             String keyToRemove = dataSnapshot.getKey();
 
-            for(int i = 0; i < mFiles.size(); i++) {
-                if(mFiles.get(i).getKey().equals(keyToRemove)) {
+            for (int i = 0; i < mFiles.size(); i++) {
+                if (mFiles.get(i).getKey().equals(keyToRemove)) {
                     mFiles.remove(i);
                     notifyDataSetChanged();
                     return;

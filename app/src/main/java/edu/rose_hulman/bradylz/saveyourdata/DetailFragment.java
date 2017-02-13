@@ -115,6 +115,20 @@ public class DetailFragment extends Fragment {
             case 1:
                 final VideoView video = (VideoView) view.findViewById(R.id.detail_video_display);
                 video.setVisibility(View.VISIBLE);
+                MediaController mediaController = new MediaController(getContext());
+                mediaController.setMediaPlayer(video);
+                video.setMediaController(mediaController);
+                video.requestFocus();
+
+                storageRef.child("videos").child(mFile.getName()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        int read = 0;
+
+                        //read =
+                    }
+                });
+
                 storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
