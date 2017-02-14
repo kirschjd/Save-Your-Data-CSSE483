@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TabHost;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -201,12 +203,9 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
-                String currentTimeStamp = dateFormat.format(new Date());
-                java.io.File f = new java.io.File(android.os.Environment.getExternalStorageDirectory(), currentTimeStamp);
-                takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                startActivityForResult(takePicture, 0);
+                if(takePicture.resolveActivity(getContext().getPackageManager()) != null) {
+                    startActivityForResult(takePicture, 0);
+                }
             }
         });
 
@@ -253,9 +252,15 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
         switch (requestCode) {
             case 0:
                 if (resultCode == RESULT_OK) {
-                    Uri selectedImage = fileReturnedIntent.getData();
-                    Log.d(Constants.TAG, "Uri: " + selectedImage);
-                    addPhotoDialog(null, optionsIndex, getActivity(), selectedImage);
+                    Bundle extras = fileReturnedIntent.getExtras();
+                    Bitmap bitmap = (Bitmap) extras.get("data");
+
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                    String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, "Title", null);
+                    Uri uri = Uri.parse(path);
+
+                    addPhotoDialog(null, optionsIndex, getActivity(), uri);
                 }
                 break;
             case 1:

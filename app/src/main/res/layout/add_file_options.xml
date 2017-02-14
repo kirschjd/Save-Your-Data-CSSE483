@@ -24,7 +24,7 @@
             android:id="@+id/textButton"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_toRightOf="@+id/videoButton"
+            android:layout_alignParentRight="true"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/text_file_icon" />
 
@@ -33,7 +33,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/photoButton"
+            android:layout_centerInParent="true"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/video_icon" />
     </RelativeLayout>

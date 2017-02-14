@@ -1,7 +1,9 @@
 package edu.rose_hulman.bradylz.saveyourdata;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -11,10 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 
 
 /**
@@ -28,7 +35,6 @@ public class LoginFragment extends Fragment {
     private View mProgressSpinner;
     private boolean mLoggingIn;
     private OnLoginListener mListener;
-    private SignInButton mGoogleSignInButton;
 
     public LoginFragment() {
     }
@@ -47,8 +53,10 @@ public class LoginFragment extends Fragment {
         mPasswordView = (EditText) rootView.findViewById(R.id.password);
         mLoginForm = rootView.findViewById(R.id.login_form);
         mProgressSpinner = rootView.findViewById(R.id.login_progress);
-        View loginButton = rootView.findViewById(R.id.email_sign_in_button);
-        mGoogleSignInButton = (SignInButton) rootView.findViewById(R.id.google_sign_in_button);
+
+        Button loginButton = (Button) rootView.findViewById(R.id.email_sign_in_button);
+        Button registerButton = (Button) rootView.findViewById(R.id.email_register_button);
+
         mEmailView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -75,31 +83,56 @@ public class LoginFragment extends Fragment {
                 login();
             }
         });
-        mGoogleSignInButton.setColorScheme(SignInButton.COLOR_LIGHT);
-        mGoogleSignInButton.setSize(SignInButton.SIZE_WIDE);
-        mGoogleSignInButton.setOnClickListener(new View.OnClickListener() {
+        registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                loginWithGoogle();
+            public void onClick(View v) {
+                register();
             }
         });
 
         return rootView;
     }
 
-    private void loginWithGoogle() {
-        if (mLoggingIn) {
-            return;
-        }
+    private void register() {
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        showProgress(true);
-        mLoggingIn = true;
-        mListener.onGoogleLogin();
-        hideKeyboard();
-    }
+        String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
 
+        boolean cancelLogin = false;
+        View focusView = null;
+
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+            mPasswordView.setError(getString(R.string.invalid_password));
+            focusView = mPasswordView;
+            cancelLogin = true;
+        }
+
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.field_required));
+            focusView = mEmailView;
+            cancelLogin = true;
+        } else if (!isEmailValid(email)) {
+            mEmailView.setError(getString(R.string.invalid_email));
+            focusView = mEmailView;
+            cancelLogin = true;
+        } else if (password == null || TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.invalid_password));
+            focusView = mPasswordView;
+            cancelLogin = true;
+        }
+
+        if (cancelLogin) {
+            // error in login
+            focusView.requestFocus();
+        } else {
+            // show progress spinner, and start background task to login
+            showProgress(true);
+            mListener.onRegister(email, password);
+            //hideKeyboard();
+        }
+    }
 
     public void login() {
         if (mLoggingIn) {
@@ -128,6 +161,10 @@ public class LoginFragment extends Fragment {
         } else if (!isEmailValid(email)) {
             mEmailView.setError(getString(R.string.invalid_email));
             focusView = mEmailView;
+            cancelLogin = true;
+        } else if (password == null || TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.invalid_password));
+            focusView = mPasswordView;
             cancelLogin = true;
         }
 
@@ -164,7 +201,6 @@ public class LoginFragment extends Fragment {
     private void showProgress(boolean show) {
         mProgressSpinner.setVisibility(show ? View.VISIBLE : View.GONE);
         mLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
-        mGoogleSignInButton.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
     private boolean isEmailValid(String email) {
@@ -194,7 +230,6 @@ public class LoginFragment extends Fragment {
 
     public interface OnLoginListener {
         void onLogin(String email, String password);
-
-        void onGoogleLogin();
+        void onRegister(String email, String password);
     }
 }

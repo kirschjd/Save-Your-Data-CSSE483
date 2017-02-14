@@ -8,13 +8,20 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import edu.rose_hulman.bradylz.saveyourdata.Constants;
 import edu.rose_hulman.bradylz.saveyourdata.File;
+import edu.rose_hulman.bradylz.saveyourdata.FileAdapter;
 import edu.rose_hulman.bradylz.saveyourdata.R;
 
 /**
@@ -25,7 +32,7 @@ import edu.rose_hulman.bradylz.saveyourdata.R;
  * Use the {@link RoomFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RoomFragment extends Fragment {
+public class RoomFragment extends Fragment implements SearchView.OnQueryTextListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -40,6 +47,8 @@ public class RoomFragment extends Fragment {
     private RoomAdapter mAdapter;
     private Context mContext;
     private RecyclerView mRecyclerView;
+    private SearchView mSearchView;
+    private DatabaseReference mFileRef;
 
     public RoomFragment() {
         // Required empty public constructor
@@ -77,9 +86,14 @@ public class RoomFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_room, container, false);
 
+        mSearchView = (SearchView) view.findViewById(R.id.browse_search_bar);
+        mSearchView.setOnQueryTextListener(this);
+        Log.d(Constants.BT_TAG, "Test log");
+
         mRecyclerView = (RecyclerView)view.findViewById(R.id.room_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
+        mFileRef = FirebaseDatabase.getInstance().getReference().child("file");
         mAdapter = new RoomAdapter(getContext(), new OnRoomFileInteractionListener() {
             @Override
             public void onRoomFileInteraction(final File file) {
@@ -90,11 +104,12 @@ public class RoomFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mAdapter.addOwner(file);
+                        Toast.makeText(getContext(), "File Downloaded", Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.create().show();
             }
-        });
+        }, mFileRef.orderByChild("owners"));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(0);
         return view;
@@ -128,8 +143,42 @@ public class RoomFragment extends Fragment {
         mContext = context;
     }
 
-    public void setUid(String uid) {
-        mUid = uid;
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        Log.d(Constants.BT_TAG, "In onQueryTextChange");
+
+        Query temp;
+
+        if(newText.isEmpty()) {
+            temp = mFileRef.orderByChild("name");
+        } else {
+            temp = mFileRef.orderByChild("name").endAt(newText);
+        }
+
+        mAdapter = new RoomAdapter(getContext(), new OnRoomFileInteractionListener() {
+            @Override
+            public void onRoomFileInteraction(final File file) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(R.string.download_prompt_title);
+                builder.setNegativeButton(android.R.string.cancel, null);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mAdapter.addOwner(file);
+                        Toast.makeText(getContext(), "File Downloaded", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.create().show();
+            }
+        }, temp);
+        Log.d(Constants.BT_TAG, "New Text: " +  newText);
+        mRecyclerView.setAdapter(mAdapter);
+        return true;
     }
 
     /**

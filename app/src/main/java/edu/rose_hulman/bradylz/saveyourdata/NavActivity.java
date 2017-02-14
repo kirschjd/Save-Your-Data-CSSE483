@@ -23,27 +23,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import org.w3c.dom.Text;
 
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeFavoritesTabFragment;
@@ -65,11 +61,9 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         RoomFragment.OnRoomFileInteractionListener,
         DetailFragment.OnFileDetailSelectedInteractionListener {
 
-    private static final int RC_GOOGLE_LOGIN = 4;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private OnCompleteListener mOnCompleteListener;
-    private GoogleApiClient mGoogleApiClient;
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
     private String mUid;
@@ -85,7 +79,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
         mAuth = FirebaseAuth.getInstance();
         initializeListeners();
-        setupGoogleSignIn();
 
         //Setting up the navigation drawer
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -96,21 +89,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-    private void setupGoogleSignIn() {
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        // Build a GoogleApiClient with access to GoogleSignIn.API and the options above.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
     }
 
     private void initializeListeners() {
@@ -163,18 +141,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_GOOGLE_LOGIN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                firebaseAuthWithGoogle(account);
-            } else {
-                showLoginError("Google authentication failed");
-            }
-        }
     }
 
     @Override
@@ -198,16 +164,37 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void onGoogleLogin() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_GOOGLE_LOGIN);
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(Constants.TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(this, mOnCompleteListener);
+    public void onRegister(final String email, final String password) {
+        //create user
+        mAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                // If sign in fails, display a message to the user. If sign in succeeds
+                // the auth state listener will be notified and logic to handle the
+                // signed in user can be handled in the listener.
+                if (authResult.getUser() == null) {
+                    Toast.makeText(NavActivity.this, "Registration failed.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+//                .addOnCompleteListener(NavActivity.this, new OnCompleteListener<AuthResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<AuthResult> task) {
+////                        Toast.makeText(NavActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+//
+//                        // If sign in fails, display a message to the user. If sign in succeeds
+//                        // the auth state listener will be notified and logic to handle the
+//                        // signed in user can be handled in the listener.
+//                        if (!task.isSuccessful()) {
+//                            Toast.makeText(NavActivity.this, "Authentication failed. " + task.getException(),
+//                                    Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            onLogin(email, password);
+//                            finish();
+//                        }
+//                    }
+//                });
     }
 
     private void showLoginError(String message) {
@@ -348,28 +335,44 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     private void editFileDialog(final File file, boolean favorited) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit " + file.getName());
-        View view = getLayoutInflater().inflate(R.layout.edit_file_dialog, null, false);
-        builder.setView(view);
-
-        final Switch fav = (Switch) view.findViewById(R.id.edit_file_fav_switch);
-        fav.setChecked(favorited);
+//        View view = getLayoutInflater().inflate(R.layout.edit_file_dialog, null, false);
+//        builder.setView(view);
+//
+//        Button fav = (Button) view.findViewById(R.id.favorite_button);
+//        Button unfav = (Button) view.findViewById(R.id.unfavorite_button);
+//
+//        fav.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//
+//        unfav.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
 
         final DatabaseReference fileRef = FirebaseDatabase.getInstance().getReference().child("file");
         final DatabaseReference ownerRef = FirebaseDatabase.getInstance().getReference().child("owner").child(mUid);
 
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.edit_favorite, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(fav.isChecked()) {
-                    fileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).setValue(true);
-                } else {
-                    fileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).removeValue();
-                }
+                fileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).setValue(true);
                 fileRef.keepSynced(true);
             }
         });
 
-        builder.setNegativeButton(android.R.string.cancel, null);
+        builder.setNegativeButton(R.string.edit_unfavorite, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                fileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).removeValue();
+                fileRef.keepSynced(true);
+            }
+        });
 
         builder.setNeutralButton(R.string.delete_file_string, new DialogInterface.OnClickListener() {
             @Override

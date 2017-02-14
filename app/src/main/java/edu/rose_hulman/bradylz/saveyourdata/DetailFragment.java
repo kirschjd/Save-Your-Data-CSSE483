@@ -3,6 +3,7 @@ package edu.rose_hulman.bradylz.saveyourdata;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -17,16 +18,24 @@ import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import org.w3c.dom.Text;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import edu.rose_hulman.bradylz.saveyourdata.ImageTasks.GetImageTask;
 import edu.rose_hulman.bradylz.saveyourdata.ImageTasks.LoadImage;
@@ -92,11 +101,13 @@ public class DetailFragment extends Fragment {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://save-your-data-csse483.appspot.com");
 
         //Based off file type set certain view to be visible
-        switch(fileType) {
+        final long MEGABYTE_CAP = 1024 * 1024 * 25;
+        switch (fileType) {
             case 0:
                 final ImageView image = (ImageView) view.findViewById(R.id.detail_photo_display);
                 image.setVisibility(View.VISIBLE);
-                storageRef.child("images").child(mFile.getName()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+
+                storageRef.child("images").child(mFile.getName()).getBytes(MEGABYTE_CAP).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {
                         // Use the bytes to display the image
@@ -108,6 +119,7 @@ public class DetailFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
+                        Toast.makeText(getContext(), "File too large to display", Toast.LENGTH_SHORT).show();
                         Log.d(Constants.TAG, "Failure");
                     }
                 });
@@ -120,26 +132,26 @@ public class DetailFragment extends Fragment {
                 video.setMediaController(mediaController);
                 video.requestFocus();
 
-                storageRef.child("videos").child(mFile.getName()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        int read = 0;
+                try {
+                    final java.io.File localFile = java.io.File.createTempFile("images", "jpg");
 
-                        //read =
-                    }
-                });
-
-                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        //Toast.makeText(Chat.this, uri.toString(), Toast.LENGTH_SHORT).show();
-                        // MediaController mc = new MediaController()
-                        // video.setMediaController(mc);
-                        video.setVideoURI(uri);
-                        video.requestFocus();
-                        //videoView.start();
-                    }
-                });
+                    storageRef.child("videos").child(mFile.getName()).getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            // Local temp file has been created
+                            video.setVideoPath(localFile.getPath());
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                            Log.d(Constants.TAG, "Failed to download video");
+                        }
+                    });
+                } catch (IOException e) {
+                    Log.d(Constants.TAG, "Caught");
+                    e.printStackTrace();
+                }
                 break;
             case 2:
                 //Set the scrollview to be visible
@@ -149,7 +161,7 @@ public class DetailFragment extends Fragment {
                 //Capture the actual text within the scroll view
                 final TextView text = (TextView) view.findViewById(R.id.detail_text_view);
 
-                storageRef.child("texts").child(mFile.getName()).getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                storageRef.child("texts").child(mFile.getName()).getBytes(MEGABYTE_CAP).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {
                         // Use the bytes to display the image
@@ -160,6 +172,7 @@ public class DetailFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
+                        Toast.makeText(getContext(), "File too large to display", Toast.LENGTH_SHORT).show();
                         Log.d(Constants.TAG, "Failure");
                     }
                 });

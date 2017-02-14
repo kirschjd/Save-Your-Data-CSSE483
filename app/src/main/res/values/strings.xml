@@ -13,7 +13,7 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="home_tab">Home</string>
-    <string name="room_tab">Room</string>
+    <string name="room_tab">Browse</string>
     <string name="settings_tab">Settings</string>
 
     <string name="home_favorites_tab">Favorites</string>
@@ -54,10 +54,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="room">Room</string>
+    <string name="room">Browse</string>
     <string name="download_prompt_title">Do you want to download this file?</string>
     <string name="input_text_title">Input Text Below:</string>
     <string name="edit_file_description">Toggle the switch to favorite this file</string>
-    <string name="edit_favorite_toggle">Favorite</string>
+    <string name="edit_favorite">Favorite</string>
     <string name="delete_file_string">Delete File</string>
+    <string name="edit_unfavorite">Unfavorite</string>
+    <string name="registration_button">Create an account</string>
 </resources>

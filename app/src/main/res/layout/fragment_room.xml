@@ -13,9 +13,17 @@
         android:textStyle="bold"
         android:id="@+id/room_title" />
 
+    <android.support.v7.widget.SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/browse_search_bar"
+        android:layout_below="@+id/room_title"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_below="@+id/room_title"
+        android:layout_below="@+id/browse_search_bar"
         android:layout_height="match_parent"
         android:id="@+id/room_recycler_view">
     </android.support.v7.widget.RecyclerView>

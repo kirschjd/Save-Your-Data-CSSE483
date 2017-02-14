@@ -2,6 +2,7 @@ package edu.rose_hulman.bradylz.saveyourdata;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -188,32 +189,36 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
             @Override
             public boolean onLongClick(View v) {
                 //Checking to see if the file is favorited by adding a single value event listener
-                final boolean[] isFaved = new boolean[1];
+//                final boolean[] isFaved = new boolean[1];
+//
+//                Query favorited = mFileRef.child(file.getKey()).orderByChild("favoritedBy/" + mUid).equalTo(true);
+//                favorited.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Log.d(Constants.TAG, "data snapshot" + dataSnapshot.getKey());
+//                        if(dataSnapshot.getValue() == null) {
+//                            Log.d(Constants.TAG, "NULL Boolean is " + isFaved[0]);
+//                            isFaved[0] = false;
+//                        } else {
+//                            Log.d(Constants.TAG, "Boolean is " + isFaved[0]);
+//                            isFaved[0] = true;
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
 
-                Query favorited = mFileRef.child(file.getKey()).orderByChild("favoritedBy/" + mUid).equalTo(true);
-                favorited.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(Constants.TAG, "data snapshot" + dataSnapshot.getKey());
-                        if(dataSnapshot.getValue() == null) {
-                            Log.d(Constants.TAG, "NULL Boolean is " + isFaved[0]);
-                            isFaved[0] = false;
-                        } else {
-                            Log.d(Constants.TAG, "Boolean is " + isFaved[0]);
-                            isFaved[0] = true;
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                //boolean isFaved = file.inFavorites(mUid);
+                boolean isFaved = (mFileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).getRoot() != null);
+                Log.d(Constants.TAG, "Boolean value: " + isFaved);
 
                 if (mInFavs) {
-                    mFListener.onLongFavoritesFileInteraction(file, isFaved[0]);
+                    mFListener.onLongFavoritesFileInteraction(file, isFaved);
                 } else {
-                    mCListener.onLongCloudFileInteraction(file, isFaved[0]);
+                    mCListener.onLongCloudFileInteraction(file, isFaved);
                 }
                 mFileRef.keepSynced(true);
                 mOwnerRef.keepSynced(true);

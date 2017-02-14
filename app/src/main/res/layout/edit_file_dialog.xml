@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp">
 
-    <TextView
-        android:text="@string/edit_file_description"
-        android:layout_width="match_parent"
+    <Button
+        android:text="@string/edit_favorite"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_file_name" />
+        android:layout_alignParentLeft="true"
+        android:id="@+id/favorite_button" />
 
-    <Switch
-        android:text="@string/edit_favorite_toggle"
-        android:layout_width="match_parent"
+    <Button
+        android:text="@string/edit_unfavorite"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_file_fav_switch" />
-</LinearLayout>
+        android:layout_alignParentRight="true"
+        android:id="@+id/unfavorite_button" />
+</RelativeLayout>

@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by bradylz on 1/20/2017.
  */
 
-public class File implements Parcelable{
+public class File implements Parcelable, Comparable<String>{
     private String name;
     private String description;
     private String filePath;
@@ -20,8 +20,17 @@ public class File implements Parcelable{
     //To identify photo(0) / video(1) / text file (2)
     private int type;
     private Map<String, Boolean> owners;
+    private Map<String, Boolean> favoritedBy;
     public static final String FILE_OWNERS = "owners";
     public static final String FILE_FAVORITEDBY = "favoritedBy";
+
+    public boolean inFavorites(String uid) {
+        return favoritedBy.containsKey(uid);
+    }
+
+    public void addFavorite(String uid) {
+        favoritedBy.put(uid, true);
+    }
 
     public void setOwners(Map<String, Boolean> owners) {
         this.owners = owners;
@@ -60,6 +69,7 @@ public class File implements Parcelable{
         this.name = title;
         this.description = description;
         owners = new HashMap<>();
+        favoritedBy = new HashMap<>();
         owners.put(uid, true);
         this.type = type;
     }
@@ -106,5 +116,10 @@ public class File implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeString(description);
+    }
+
+    @Override
+    public int compareTo(String name) {
+        return this.name.compareTo(name);
     }
 }
