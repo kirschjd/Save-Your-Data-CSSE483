@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SaveYourData</string>
+    <string name="app_name">Pics or it Didn\'t Happen</string>
 
     <!-- Strings related to login -->
     <string name="action_sign_in_short">Sign in</string>
@@ -13,7 +13,7 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="home_tab">Home</string>
-    <string name="room_tab">Browse</string>
+    <string name="browse_tab">Browse</string>
     <string name="settings_tab">Settings</string>
 
     <string name="home_favorites_tab">Favorites</string>
@@ -40,9 +40,6 @@
     <string name="field_required">This field is required</string>
     <string name="login_error">Login Error!</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="room_content_tab">Content</string>
-    <string name="room_people_tab">People</string>
     <string name="file_name">File name</string>
     <string name="file_description">File description</string>
     <string name="dialog_add_title">Add a file name and description</string>
@@ -52,9 +49,7 @@
     <string name="video">Video</string>
     <string name="text_file">Text File</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="room">Browse</string>
+    <string name="browse">Browse</string>
     <string name="download_prompt_title">Do you want to download this file?</string>
     <string name="input_text_title">Input Text Below:</string>
     <string name="edit_file_description">Toggle the switch to favorite this file</string>
@@ -62,4 +57,6 @@
     <string name="delete_file_string">Delete File</string>
     <string name="edit_unfavorite">Unfavorite</string>
     <string name="registration_button">Create an account</string>
+    <string name="studio_email">lzbrady496@gmail.com</string>
+    <string name="studio_name">Kirsch-Brady Studios</string>
 </resources>

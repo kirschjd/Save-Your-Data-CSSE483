@@ -46,10 +46,6 @@ public class HomeFavoritesTabFragment extends Fragment {
         mAdapter = fileAdapter;
     }
 
-    public FileAdapter getAdapter() {
-        return mAdapter;
-    }
-
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -87,32 +83,6 @@ public class HomeFavoritesTabFragment extends Fragment {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.home_favorites_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
-//        mAdapter = new FileAdapter(getContext(), mRecyclerView, new OnHomeFavoritesFileSelectedInteractionListener() {
-//            @Override
-//            public void onHomeFavoritesFileInteraction(File file) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_detail, null, false);
-//                builder.setView(view);
-//
-//                //Getting which type of file it is to populate according layout feature
-//                int fileType = file.getType();
-//                String path = file.getFilePath();
-//                switch(fileType) {
-//                    case 0:
-//
-//                        break;
-//                    case 1:
-//                        break;
-//                    case 2:
-//                        break;
-//                    default:
-//                        //This means there is some sort of error
-//                        break;
-//                }
-//
-//                builder.create().show();
-//            }
-//        });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(0);
         return view;
@@ -125,10 +95,6 @@ public class HomeFavoritesTabFragment extends Fragment {
         }
     }
 
-//    public void add(File file) {
-//        mAdapter.add(file);
-//    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -136,7 +102,7 @@ public class HomeFavoritesTabFragment extends Fragment {
             mListener = (OnHomeFavoritesFileSelectedInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnRoomFileInteractionListener");
+                    + " must implement OnBrowseFileInteractionListener");
         }
     }
 

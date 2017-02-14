@@ -1,6 +1,5 @@
 package edu.rose_hulman.bradylz.saveyourdata;
 
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,16 +16,9 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,7 +26,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,22 +34,16 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeCloudTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeFavoritesTabFragment;
-import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeGeneralTabFragment;
 import edu.rose_hulman.bradylz.saveyourdata.HomePackage.HomeTabsFragment;
-import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomContentTabFragment;
-import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomFragment;
-import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomPeopleTabFragment;
-import edu.rose_hulman.bradylz.saveyourdata.RoomPackage.RoomTabsFragment;
+import edu.rose_hulman.bradylz.saveyourdata.BrowsePackage.BrowseFragment;
 
 public class NavActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         HomeTabsFragment.OnFragmentInteractionListener,
         HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener,
-        HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
         HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener,
-        RoomTabsFragment.OnFragmentInteractionListener,
         LoginFragment.OnLoginListener,
         GoogleApiClient.OnConnectionFailedListener,
-        RoomFragment.OnRoomFileInteractionListener,
+        BrowseFragment.OnBrowseFileInteractionListener,
         DetailFragment.OnFileDetailSelectedInteractionListener {
 
     private FirebaseAuth mAuth;
@@ -178,23 +163,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
                 }
             }
         });
-//                .addOnCompleteListener(NavActivity.this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-////                        Toast.makeText(NavActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
-//
-//                        // If sign in fails, display a message to the user. If sign in succeeds
-//                        // the auth state listener will be notified and logic to handle the
-//                        // signed in user can be handled in the listener.
-//                        if (!task.isSuccessful()) {
-//                            Toast.makeText(NavActivity.this, "Authentication failed. " + task.getException(),
-//                                    Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            onLogin(email, password);
-//                            finish();
-//                        }
-//                    }
-//                });
     }
 
     private void showLoginError(String message) {
@@ -232,9 +200,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.action_logout) {
+        if (id == R.id.action_logout) {
             onLogout();
             return true;
         }
@@ -265,8 +231,8 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
             case R.id.nav_home:
                 switchTo = new HomeTabsFragment();
                 break;
-            case R.id.nav_room:
-                switchTo = new RoomFragment();
+            case R.id.nav_browse:
+                switchTo = new BrowseFragment();
                 break;
             case R.id.nav_settings:
                 Intent intent = new Intent(Settings.ACTION_SETTINGS);
@@ -282,8 +248,8 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
 
         if (switchTo != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.addToBackStack("previous");
             ft.replace(R.id.content_nav, switchTo);
+            ft.addToBackStack("previous");
             ft.commit();
         }
 
@@ -298,7 +264,7 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void onRoomFileInteraction(File file) {
+    public void onBrowseFileInteraction(File file) {
 
     }
 
@@ -322,8 +288,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         editFileDialog(file, fav);
     }
 
-    // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
-
     private void switchToDetailView(File file) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         DetailFragment fragment = DetailFragment.newInstance(file);
@@ -335,25 +299,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
     private void editFileDialog(final File file, boolean favorited) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit " + file.getName());
-//        View view = getLayoutInflater().inflate(R.layout.edit_file_dialog, null, false);
-//        builder.setView(view);
-//
-//        Button fav = (Button) view.findViewById(R.id.favorite_button);
-//        Button unfav = (Button) view.findViewById(R.id.unfavorite_button);
-//
-//        fav.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        unfav.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
 
         final DatabaseReference fileRef = FirebaseDatabase.getInstance().getReference().child("file");
         final DatabaseReference ownerRef = FirebaseDatabase.getInstance().getReference().child("owner").child(mUid);
@@ -384,10 +329,6 @@ public class NavActivity extends AppCompatActivity implements NavigationView.OnN
         });
 
         builder.create().show();
-    }
-
-    @Override
-    public void onHomeGeneralFileInteraction(File file) {
     }
 
     @Override

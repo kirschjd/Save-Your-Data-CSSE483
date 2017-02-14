@@ -7,9 +7,9 @@
             android:icon="@drawable/home_icon"
             android:title="@string/home_tab"/>
         <item
-            android:id="@+id/nav_room"
-            android:icon="@drawable/room_icon"
-            android:title="@string/room_tab" />
+            android:id="@+id/nav_browse"
+            android:icon="@drawable/browse_icon"
+            android:title="@string/browse_tab" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/settings_icon"

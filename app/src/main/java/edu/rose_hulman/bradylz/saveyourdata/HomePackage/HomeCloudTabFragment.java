@@ -28,7 +28,6 @@ import edu.rose_hulman.bradylz.saveyourdata.R;
  * create an instance of this fragment.
  */
 public class HomeCloudTabFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -94,13 +93,6 @@ public class HomeCloudTabFragment extends Fragment {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.home_cloud_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
-
-//        , recyclerView, new HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener() {
-//            @Override
-//            public void onHomeFavoritesFileInteraction(File file) {
-//                //TODO: copy similar method from downloads fragment
-//            }
-//        });
         mAdapter.setRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.scrollToPosition(0);
@@ -121,7 +113,7 @@ public class HomeCloudTabFragment extends Fragment {
             mListener = (OnHomeCloudFileInteractionSelectedListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnRoomFileInteractionListener");
+                    + " must implement OnBrowseFileInteractionListener");
         }
     }
 

@@ -130,7 +130,7 @@ public class LoginFragment extends Fragment {
             // show progress spinner, and start background task to login
             showProgress(true);
             mListener.onRegister(email, password);
-            //hideKeyboard();
+            hideKeyboard();
         }
     }
 
@@ -218,7 +218,7 @@ public class LoginFragment extends Fragment {
             mListener = (OnLoginListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnRoomFileInteractionListener");
+                    + " must implement OnBrowseFileInteractionListener");
         }
     }
 

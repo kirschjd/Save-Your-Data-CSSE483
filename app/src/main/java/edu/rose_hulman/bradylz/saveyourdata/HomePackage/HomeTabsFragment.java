@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -47,7 +48,6 @@ import static android.app.Activity.RESULT_OK;
  * create an instance of this fragment.
  */
 public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragment.OnHomeFavoritesFileSelectedInteractionListener,
-        HomeGeneralTabFragment.OnHomeGeneralFileInteractionSelectedListener,
         HomeCloudTabFragment.OnHomeCloudFileInteractionSelectedListener,
         TabHost.OnTabChangeListener {
     // TODO: Rename parameter arguments, choose names that match
@@ -379,7 +379,7 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnRoomFileInteractionListener");
+                    + " must implement OnBrowseFileInteractionListener");
         }
     }
 
@@ -406,11 +406,6 @@ public class HomeTabsFragment extends Fragment implements HomeFavoritesTabFragme
 
     @Override
     public void onLongFavoritesFileInteraction(File file, boolean fav) {
-
-    }
-
-    @Override
-    public void onHomeGeneralFileInteraction(File file) {
 
     }
 

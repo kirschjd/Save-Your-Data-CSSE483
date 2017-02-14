@@ -37,10 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import edu.rose_hulman.bradylz.saveyourdata.ImageTasks.GetImageTask;
-import edu.rose_hulman.bradylz.saveyourdata.ImageTasks.LoadImage;
-
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -101,7 +97,7 @@ public class DetailFragment extends Fragment {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://save-your-data-csse483.appspot.com");
 
         //Based off file type set certain view to be visible
-        final long MEGABYTE_CAP = 1024 * 1024 * 25;
+        final long MEGABYTE_CAP = 1024 * 1024 * 1000;
         switch (fileType) {
             case 0:
                 final ImageView image = (ImageView) view.findViewById(R.id.detail_photo_display);
@@ -205,21 +201,6 @@ public class DetailFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-//    @Override
-//    public void onPicLoaded(File file) {
-//        mFile = file;
-//
-//        new GetImageTask(this).execute(file.getUrl());
-//    }
-//
-//    @Override
-//    public void onImageLoaded(Bitmap bitmap) {
-//        mPic.setBitmap(bitmap);
-//        mImageView.setImageBitmap(bitmap);
-//
-//        mAttacher.update();
-//    }
 
     /**
      * This interface must be implemented by activities that contain this

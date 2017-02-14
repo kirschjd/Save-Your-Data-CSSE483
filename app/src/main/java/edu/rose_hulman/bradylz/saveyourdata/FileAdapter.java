@@ -188,31 +188,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //Checking to see if the file is favorited by adding a single value event listener
-//                final boolean[] isFaved = new boolean[1];
-//
-//                Query favorited = mFileRef.child(file.getKey()).orderByChild("favoritedBy/" + mUid).equalTo(true);
-//                favorited.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        Log.d(Constants.TAG, "data snapshot" + dataSnapshot.getKey());
-//                        if(dataSnapshot.getValue() == null) {
-//                            Log.d(Constants.TAG, "NULL Boolean is " + isFaved[0]);
-//                            isFaved[0] = false;
-//                        } else {
-//                            Log.d(Constants.TAG, "Boolean is " + isFaved[0]);
-//                            isFaved[0] = true;
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-
-                //boolean isFaved = file.inFavorites(mUid);
-                boolean isFaved = (mFileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).getRoot() != null);
+               boolean isFaved = (mFileRef.child(file.getKey()).child(File.FILE_FAVORITEDBY).child(mUid).getRoot() != null);
                 Log.d(Constants.TAG, "Boolean value: " + isFaved);
 
                 if (mInFavs) {
@@ -236,8 +212,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
         // Add the current user to the owners attribute
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
-        // Add the current user to the favoritedBy attribute, but set to false
-        // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
         //Add the file to storage
         StorageReference videoRef = mVideosRef.child(fileName);
@@ -260,8 +234,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
         // Add the current user to the owners attribute
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
-        // Add the current user to the favoritedBy attribute, but set to false
-        // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
         //Add the file to storage
         StorageReference textRef = mTextRef.child(fileName);
@@ -284,8 +256,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         ref.setValue(new File(fileName, fileDescription, mUid, fileType));
         // Add the current user to the owners attribute
         ref.child(File.FILE_OWNERS).child(mUid).setValue(true);
-        // Add the current user to the favoritedBy attribute, but set to false
-        // ref.child(File.FILE_FAVORITEDBY).child(mUid).setValue(false);
 
         //Add the file to storage
         StorageReference imageRef = mImagesRef.child(fileName);
