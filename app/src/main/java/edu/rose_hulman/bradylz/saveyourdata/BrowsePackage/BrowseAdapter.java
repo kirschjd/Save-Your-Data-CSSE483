@@ -52,16 +52,11 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.ViewHolder
         mUid = prefs.getString(NavActivity.KEY_UID, ""); //TODO: Means there is no uid
 
         //Initializing firebase references
-        //TODO: Change to deal with the uids retrieved from bluetooth
         mFileRef = FirebaseDatabase.getInstance().getReference().child("file");
         mOwnerRef = FirebaseDatabase.getInstance().getReference().child("owner/" + mUid);
 
         mQuery = query;
         mQuery.addChildEventListener(new BrowseFileEventListener());
-    }
-
-    public void setModels(List<File> models) {
-        mFiles = new ArrayList<>(models);
     }
 
     //Our attempt at bluetooth. We were able to enable bluetooth and have a device set to be discoverable,

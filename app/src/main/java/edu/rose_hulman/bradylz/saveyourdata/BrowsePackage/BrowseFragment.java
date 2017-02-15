@@ -86,8 +86,6 @@ public class BrowseFragment extends Fragment implements SearchView.OnQueryTextLi
 
         mSearchView = (SearchView) view.findViewById(R.id.browse_search_bar);
         mSearchView.setOnQueryTextListener(this);
-        Log.d(Constants.BT_TAG, "Test log");
-
         mRecyclerView = (RecyclerView)view.findViewById(R.id.browse_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
@@ -155,7 +153,7 @@ public class BrowseFragment extends Fragment implements SearchView.OnQueryTextLi
         if(newText.isEmpty()) {
             temp = mFileRef.orderByChild("name");
         } else {
-            temp = mFileRef.orderByChild("name").endAt(newText);
+            temp = mFileRef.orderByChild("name").endAt(((newText.substring(0,1).toUpperCase()) + (newText.substring(1).toLowerCase()) + "z"));
         }
 
         mAdapter = new BrowseAdapter(getContext(), new OnBrowseFileInteractionListener() {
@@ -174,7 +172,6 @@ public class BrowseFragment extends Fragment implements SearchView.OnQueryTextLi
                 builder.create().show();
             }
         }, temp);
-        Log.d(Constants.BT_TAG, "New Text: " +  newText);
         mRecyclerView.setAdapter(mAdapter);
         return true;
     }
